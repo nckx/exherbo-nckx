@@ -1,0 +1,20 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="Synthetic load generator"
+DESCRIPTION="
+lookbusy generates synthetic CPU, memory and disk access loads on a host.
+CPU load is induced by simple arithmetic looping (with as little memory
+bandwidth consumption as feasible) alternating with periods of sleeping
+in an attempt to generate the degree of utilization selected. Memory load
+is induced by allocating a buffer of a controllable size, then steadily
+stirring it to keep the pages active from the VM standpoint. Disk load is
+induced through creation of one or more files, and copying blocks of it
+between two moving positions."
+HOMEPAGE="http://www.devin.com/${PN}/"
+DOWNLOADS="${HOMEPAGE%/}/download/${PNV}.tar.gz"
+LICENCES="GPL-3 GPL-2"
+SLOT="0"
+

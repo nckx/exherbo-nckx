@@ -1,0 +1,26 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require samba-component [ component=${PN#lib} ]
+
+SUMMARY="Samba platform core compatibility layer"
+DESCRIPTION="
+This subsystem ensures that we can always use a certain core set of 
+functions and types, that are either provided by the OS or by replacement 
+functions / definitions in this subsystem. The aim is to try to stick 
+to POSIX functions in here as much as possible. Convenience functions 
+that are available on no platform at all belong in other subsystems
+(such as LIBUTIL).
+"
+LICENCES="LGPL-3"
+
+PLATFORMS="~amd64"
+
+src_install() {
+    waf_src_install
+
+    # FIXME:
+    edo mv "${IMAGE}"/usr/${LIBDIR}/${PN}/* "${IMAGE}"/usr/${LIBDIR}
+    edo rmdir "${IMAGE}"/usr/${LIBDIR}/${PN}
+}
+

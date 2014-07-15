@@ -1,0 +1,30 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require ntp
+DOWNLOADS=
+SCM_REPOSITORY="rsync://archive.ntp.org"
+SCM_BRANCH="ntp-dev-src"
+SLOT="scm"
+
+DEPENDENCIES="
+    fetch:
+        net-misc/rsync
+"
+
+PLATFORMS="~amd64"
+
+SCM_HOME="${FETCHEDDIR}/scm"
+
+src_fetch_extra() {
+    edo rsync -avz "${SCM_REPOSITORY}/${SCM_BRANCH}" "${SCM_HOME}"/${PN}
+}
+
+src_unpack() {
+    edo cp -a "${SCM_HOME}"/${PN} ${PNV}
+}
+
+src_prepare() {
+    edo ./bootstrap
+}
+

@@ -1,0 +1,17 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Copyright 2010 Piotr Jaroszyński <p.jaroszynski@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require parallel
+
+SCM_REPOSITORY="git://git.savannah.gnu.org/parallel.git"
+require scm-git
+
+PLATFORMS="~amd64"
+
+src_prepare() {
+    default
+
+    edo autoreconf
+}
+

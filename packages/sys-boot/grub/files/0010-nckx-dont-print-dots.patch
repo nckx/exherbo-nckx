@@ -1,0 +1,34 @@
+diff --git a/grub-core/boot/i386/pc/diskboot.S b/grub-core/boot/i386/pc/diskboot.S
+index d030a14..cd40243 100644
+--- a/grub-core/boot/i386/pc/diskboot.S
++++ b/grub-core/boot/i386/pc/diskboot.S
+@@ -276,10 +276,8 @@ LOCAL(copy_buffer):
+ 	rep		/* sets a repeat */
+ 	movsw		/* this runs the actual copy */
+ 
+-	/* restore addressing regs and print a dot with correct DS
+-	   (MSG modifies SI, which is saved, and unused AX and BX) */
++	/* restore addressing regs */
+ 	popw	%ds
+-	MSG(notification_step)
+ 	popa
+ 
+ 	/* check if finished with this dataset */
+@@ -296,7 +294,6 @@ LOCAL(copy_buffer):
+ 
+ LOCAL(bootit):
+ 	/* print a newline */
+-	MSG(notification_done)
+ 	popw	%dx	/* this makes sure %dl is our "boot" drive */
+ 	ljmp	$0, $(GRUB_BOOT_MACHINE_KERNEL_ADDR + 0x200)
+ 
+@@ -322,9 +319,6 @@ LOCAL(stop):	jmp	LOCAL(stop)
+ 
+ notification_string:	.asciz "loading"
+ 
+-notification_step:	.asciz "."
+-notification_done:	.asciz "\r\n"
+-
+ geometry_error_string:	.asciz "Geom"
+ read_error_string:	.asciz "Read"
+ general_error_string:	.asciz " Error"

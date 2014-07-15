@@ -1,0 +1,16 @@
+diff --git a/grub-core/normal/menu_text.c b/grub-core/normal/menu_text.c
+index 1cdad64..6bf249a 100644
+--- a/grub-core/normal/menu_text.c
++++ b/grub-core/normal/menu_text.c
+@@ -198,8 +198,10 @@ print_entry (int y, int highlight, grub_menu_entry_t entry,
+       unicode_title[i] = ' ';
+ 
+   if (data->geo.num_entries > 1)
+-    for (i = 0; i < STANDARD_MARGIN; i++)
++    for (i = 2; i < STANDARD_MARGIN; i++)
+       grub_putcode (' ', data->term);
++  grub_putcode (highlight ? GRUB_UNICODE_RIGHTARROW : ' ', data->term);
++  grub_putcode (' ', data->term);
+ 
+   grub_print_ucs4_menu (unicode_title,
+ 			unicode_title + len,

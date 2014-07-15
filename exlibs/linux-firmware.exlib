@@ -1,0 +1,32 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+# NOTE: this exlib is not for generic Linux firmware, but firmware from the
+# linux-firmware repository. I just don't have any other needs at the moment
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+myexparam subdirectory=${PN#linux-firmware-}
+
+HOMEPAGE="https://git.kernel.org/cgit/linux/kernel/git/firmware/linux-firmware.git/"
+if ever is_scm; then
+    SCM_REPOSITORY="git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git"
+    SCM_CHECKOUT_TO="linux-firmware"
+    require scm-git
+fi
+SLOT="0"
+
+LINUX_FIRMWARE_PATH=${LIBDIR}/firmware
+exparam -v LINUX_FIRMWARE_SUBDIRECTORY subdirectory
+
+export_exlib_phases src_install
+
+DEFAULT_SRC_INSTALL_EXTRA_DOCS+=( WHENCE )
+
+linux-firmware_src_install() {
+    insinto "${LINUX_FIRMWARE_PATH}"
+    doins -r "${LINUX_FIRMWARE_SUBDIRECTORY}"
+
+    emagicdocs
+}
+

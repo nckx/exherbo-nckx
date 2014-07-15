@@ -1,0 +1,24 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="Versatile replacement for vmstat, iostat, netstat and ifstat"
+DESCRIPTION="
+Dstat allows you to view all of your system resources in
+real-time, you can eg. compare disk utilization in combination with
+interrupts from your IDE controller, or compare the network bandwidth
+numbers directly with the disk throughput (in the same interval). Dstat
+gives you detailed selective information in columns and clearly indicates
+in what magnitude and unit the output is displayed. Less confusion, fewer
+mistakes.
+"
+HOMEPAGE="http://dag.wieers.com/home-made/${PN}/"
+LICENCES="GPL-2"
+SLOT="0"
+
+DEPENDENCIES="
+    run:
+        dev-lang/python:*[<3]
+"
+

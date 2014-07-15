@@ -1,0 +1,182 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Based on work by NAKAMURA Yoshitaka
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="HTTP and reverse proxy server, as well as a mail proxy server"
+HOMEPAGE="http://nginx.org/"
+LICENCES="BSD-2"
+SLOT="0"
+
+DEPENDENCIES="
+    build+run:
+        dev-libs/openssl
+        pcre? ( dev-libs/pcre )
+        sys-libs/zlib
+        user/nginx
+"
+
+require systemd-service
+
+export_exlib_phases pkg_setup src_configure src_install
+
+nginx_pkg_setup() {
+    exdirectory --allow /srv
+}
+
+NGINX_OPTION_WITHS=(
+    'file-aio'
+    'http           [[ description = [ HTTP server ] requires = pcre ]]'
+    'http-cache     [[ description = [ HTTP cache ] ]]'
+    'mail           [[ description = [ Mail server ] ]]'
+    'pcre'
+)
+
+NGINX_OPTION_MODULE_WITHS=(
+    'rtsig'
+    'select'
+    'poll'
+    'google_perftools'
+    'cpp_test'
+)
+
+NGINX_OPTION_HTTP_MODULE_WITHS=(
+    'ssl'
+    'spdy'
+    'realip'
+    'addition'
+    'xslt'
+    'image_filter'
+    'geoip'
+    'sub'
+    'dav'
+    'flv'
+    'mp4'
+    'gunzip'
+    'gzip_static'
+    'auth_request'
+    'random_index'
+    'secure_link'
+    'degradation'
+    'stub_status'
+    'charset'
+    'gzip'
+    'ssi'
+    'userid'
+    'access'
+    'auth_basic'
+    'autoindex'
+    'geo'
+    'map'
+    'split_clients'
+    'referer'
+    'rewrite'
+    'proxy'
+    'fastcgi'
+    'uwsgi'
+    'scgi'
+    'memcached'
+    'limit_conn'
+    'limit_req'
+    'empty_gif'
+    'browser'
+    'upstream_ip_hash'
+    'upstream_least_conn'
+    'upstream_keepalive'
+    'perl'
+)
+
+NGINX_OPTION_MAIL_MODULE_WITHS=(
+    'mail_ssl'
+    'pop3'
+    'imap'
+    'smtp'
+)
+
+MYOPTIONS+="
+    ${NGINX_OPTION_WITHS[*]}
+    ( nginx_modules: ${NGINX_OPTION_MODULE_WITHS[*]} )
+    ( nginx_modules: ${NGINX_OPTION_HTTP_MODULE_WITHS[*]} )
+        [[ *requires = http ]]
+    ( nginx_modules: ${NGINX_OPTION_MAIL_MODULE_WITHS[*]} )
+        [[ *requires = mail ]]
+"
+
+nginx_src_configure() {
+    local option= options=(
+        --prefix=/srv/www/nginx
+        --conf-path=/etc/nginx/nginx.conf
+        --sbin-path=/usr/sbin/nginx
+        --pid-path=/run/nginx.pid
+        --lock-path=/run/lock/nginx.lock
+        --http-client-body-temp-path=/tmp/nginx/client
+        --http-proxy-temp-path=/tmp/nginx/proxy
+        --http-fastcgi-temp-path=/tmp/nginx/fastcgi
+        --http-scgi-temp-path=/tmp/nginx/scgi
+        --http-uwsgi-temp-path=/tmp/nginx/uwsgi
+        --error-log-path=/var/log/nginx/error_log
+        --http-log-path=/var/log/nginx/access_log
+        --user=nginx --group=nginx
+        --with-ipv6
+    )
+
+    local output_hack="$( auto/configure --help )"
+    function with_options() {
+        local prefix="${1}" suffix="${2}" option=
+        shift 2
+
+        for option in "${@}"; do
+            set ${option}
+            option="${prefix}${1#${prefix}}${suffix}"
+            if option "${suffix:+nginx${suffix}s:}${1}"; then
+                option="--with-${option}"
+            else
+                option="--without-${option}"
+            fi
+            if [[ ! "${output_hack//* ${option} *}" ]]; then
+                options+=( "${option}" )
+            elif [[ "${output_hack//*[io][tu][ht]-${option#--*-}[^_a-z]*}" ]]; then
+                eerror "Option '${1}' seems to be outdated."
+            fi
+        done
+    }
+
+    with_options ''     ''      "${NGINX_OPTION_WITHS[@]}"
+    with_options ''     _module "${NGINX_OPTION_MODULE_WITHS[@]}"
+    with_options http_  _module "${NGINX_OPTION_HTTP_MODULE_WITHS[@]}"
+    with_options mail_  _module "${NGINX_OPTION_MAIL_MODULE_WITHS[@]}"
+
+    edo auto/configure "${options[@]}"
+}
+
+nginx_src_install() {
+    default
+
+    doman docs/man/nginx.8
+
+    edo rmdir "${IMAGE}"/run
+    keepdir /var/log/nginx
+
+    insinto /usr/"${LIBDIR}"/tmpfiles.d
+    hereins nginx.conf <<EOF
+d /tmp/nginx            0755 nginx nginx
+d /tmp/nginx/client     0700 nginx nginx
+d /tmp/nginx/proxy      0700 nginx nginx
+d /tmp/nginx/fastcgi    0700 nginx nginx
+d /tmp/nginx/scgi       0700 nginx nginx
+d /tmp/nginx/uwsgi      0700 nginx nginx
+EOF
+
+    if option "nginx_modules:perl"; then
+        edo rm "${IMAGE}"/usr/"${LIBDIR}"/perl5/5.*/*/perllocal.pod
+        edo rmdir "${IMAGE}"/usr/${LIBDIR}/perl5/5.*/*/
+        edo rmdir "${IMAGE}"/usr/${LIBDIR}/perl5/5.*/
+    fi
+
+    install_systemd_files
+    option systemd && edo sed -i -e "1 i# for systemd, don't daemonize" \
+                                 -e '1 idaemon off;' \
+                                 "${IMAGE}"/etc/nginx/nginx.conf
+}
+

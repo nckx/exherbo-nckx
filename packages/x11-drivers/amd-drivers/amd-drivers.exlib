@@ -1,0 +1,140 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Copyright 2010 Johannes Nixdorf <mixi@user-helfen-usern.de>
+# Distributed under the terms of the GNU General Public License v3
+# Based in part upon 'nvidia-drivers.exlib', which is
+#     Copyright 2009, 2010 Ingmar Vanhassel
+#     Copyright 2010 Wulf C. Krueger <philantrop@exherbo.org>
+#     Copyright 2010 Piotr Jaorszyński <p.jaroszynski@gmail.com>
+# and 'ati-drivers-10.8.ebuild', which is
+#     Copytight 1999-2010 Gentoo Foundation
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+require makeself alternatives
+
+SUMMARY="AMD Catalyst X11 driver and GLX libraries"
+HOMEPAGE="http://support.amd.com/us/gpudownload/linux/Pages/radeon_linux.aspx"
+DOWNLOADS="
+listed-only:
+    http://www2.ati.com/drivers/linux/amd-catalyst-${PV/./-}-linux-x86-x86_64.zip
+"
+
+LICENCES="
+    ATI     [[ note = [ The driver itself ] ]]
+    BSD-3   [[ note = [ The kernel module Makefile ] ]]
+"
+SLOT="0"
+
+DEPENDENCIES="
+    run:
+        x11-libs/libX11
+        x11-libs/libXau
+        x11-libs/libXdmcp
+        x11-libs/libXext
+        x11-libs/libXrandr
+        x11-libs/libXrender
+        x11-libs/libxcb
+    recommendation:
+        x11-libs/qt:4[X(+)] [[ description = [ Needed for the catalyst control center ] ]]
+"
+        #x11-server/xorg-server[xinerama]
+
+DEFAULT_SRC_PREPARE_PATCHES=(
+    -p1 "${FILES}/${PNV}-makefile.patch"
+)
+
+export_exlib_phases src_unpack src_install
+
+amd-drivers_src_unpack() {
+    edo grep -a ^signature= "${FETCHEDDIR}"/${ARCHIVES} \
+        | edo cut -d\" -f2 > "${WORKBASE}/signature"
+
+    unpack_makeself
+}
+
+amd-drivers_src_install() {
+    local xorg_prefix=xpic xorg_suffix=
+
+    if [[ ${ARCH} == x86_64 ]]; then
+        xorg_suffix=_64a
+    fi
+
+    # everything arch-specific:
+    # binaries
+    dosbin arch/${ARCH}/usr/sbin/*
+    dobin arch/${ARCH}/usr/X11R6/bin/*
+
+    # libraries
+    dolib.so arch/${ARCH}/usr/${LIBDIR}/*.so*
+    dolib.so arch/${ARCH}/usr/X11R6/${LIBDIR}/*so*
+    edo ln -s atiuki.so.1.0 "${IMAGE}/usr/${LIBDIR}/atiuki.so.1"
+
+    # dri module
+    exeinto /usr/${LIBDIR}/dri
+    doexe arch/${ARCH}/usr/X11R6/${LIBDIR}/modules/dri/fglrx_dri.so
+
+    # xorg specific
+    local f
+    for f in $(find ${xorg_prefix}${xorg_suffix}/usr/X11R6/${LIBDIR}/modules/ -type f) ; do
+        case ${f} in
+            *drivers*) exeinto /usr/${LIBDIR}/xorg/modules/drivers ;;
+            *extensions*) exeinto /usr/${LIBDIR}/xorg/modules/extensions ;;
+            *linux*) exeinto /usr/${LIBDIR}/xorg/modules/linux ;;
+            *) exeinto /usr/${LIBDIR}/xorg/modules ;;
+        esac
+        doexe ${f}
+    done
+
+    dolib.so arch/${ARCH}/usr/X11R6/${LIBDIR}/fglrx/fglrx-libGL.so.1.2
+
+    # move libGL.so.1.2 so ldconfig doesn't pick it up
+    edo mkdir "${IMAGE}"/usr/${LIBDIR}/libGL
+    edo mv "${IMAGE}"/usr/${LIBDIR}/{fglrx-libGL.so.1.2,libGL/libGL-fglrx.so}
+    # rename libglx.so
+    edo mv "${IMAGE}"/usr/${LIBDIR}/xorg/modules/extensions/{fglrx-,}libglx.so
+
+    # non arch-specific:
+    # etc.
+    insinto /etc/ati
+    doins common/etc/ati/{amdpcsdb.default,atiogl.xml,control,logo*} \
+          "${WORKBASE}/signature"
+    insopts -m0755
+    doins common/etc/ati/authatieventsd.sh
+
+    # includes
+    insinto /usr/include
+    doins -r common/usr/include/*
+
+    # scripts
+    dosbin common/usr/sbin/*
+    dobin common/usr/X11R6/bin/*
+
+    # doc
+    dodoc -r common/usr/share/doc/*
+    doman common/usr/share/man/man8/atieventsd.8
+
+    # kernel modules, some arch dependent stuff again:
+    insinto /usr/src/fglrx-${PVR}
+    doins common/lib/modules/fglrx/build_mod/{*.c,*.h}
+    doins common/lib/modules/fglrx/build_mod/2.6.x/Makefile
+    doins arch/${ARCH}/lib/modules/fglrx/build_mod/*
+    # note: the patches are only shipped for convinience. they might not be
+    # necessary in all kernel configurations
+    doins "${FILES}/${PNV}-compat_alloc_user_space.patch"
+
+    # ccc .desktop file, icon
+    insinto /usr/share/applications
+    doins common/usr/share/applications/*
+    insinto /usr/share/pixmaps
+    doins common/usr/share/icons/ccc_large.xpm
+
+    # alternatives
+    local alternatives=(
+        /usr/${LIBDIR}/libGL{.so,/libGL-fglrx.so}
+        /usr/${LIBDIR}/libGL{.so.1,/libGL-fglrx.so}
+        /usr/${LIBDIR}/xorg/modules/extensions/libglx.so{,.fglrx}
+    )
+
+    alternatives_for opengl ${PN} 1 ${alternatives[@]}
+}
+

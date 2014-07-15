@@ -1,0 +1,34 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+require btrfs-progs systemd-service [ systemd_files=[ \
+    "${REPODIR}"/packages/${CATEGORY}/${PN}/files/systemd ] ]
+# Requiring github.exlib isn't possible when overriding scm-git!
+SCM_REPOSITORY="git://github.com/kdave/${PN}"
+require scm-git
+
+SLOT="0"
+
+src_unpack() {
+    scm_src_unpack
+
+    cd "${WORK}"
+    local branch="$( git branch -a | grep "integration-[0-9]" )"
+    branch="${branch##*$'\n'}"
+    if [[ ! "${branch}" ]]; then
+        die "No integration-\${DATE} branch found." \
+            "Remove ${SCM_CHECKOUT_TO} and try again."
+    fi
+    edo git checkout "${branch##*/}"
+}
+
+src_install() {
+    btrfs-progs_src_install
+
+    for idiotic_cruft in "${IMAGE}"/usr/{bin,share/man/man*}/*fsck*; do
+        edo rm "${idiotic_cruft}"
+    done
+}
+

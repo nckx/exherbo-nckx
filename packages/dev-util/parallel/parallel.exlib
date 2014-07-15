@@ -1,0 +1,22 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Copyright 2010 Piotr Jaroszyński <p.jaroszynski@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="Build and execute shell command lines from standard input in parallel"
+DESCRIPTION="
+GNU parallel is a shell tool for executing jobs in parallel locally or using
+remote computers. A job is typically a single command or a small script that
+has to be run for each of the lines in the input. The typical input is a list
+of files, a list of hosts, a list of users, a list of URLs, or a list of
+tables.
+"
+LICENCES="GPL-3"
+SLOT="0"
+
+DEPENDENCIES="
+    build+run:
+        dev-lang/perl:*
+"
+

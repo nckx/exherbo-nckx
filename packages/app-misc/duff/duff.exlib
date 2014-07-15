@@ -1,0 +1,16 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="Quickly find duplicates in a given set of files"
+DESCRIPTION="
+duff is a Unix command-line utility for quickly finding duplicates in a
+given set of files. duff is written in C, uses gettext where available,
+is licensed under the zlib/libpng license and should compile on most modern
+Unices.
+"
+HOMEPAGE="http://${PN}.sourceforge.net"
+LICENCES="ZLIB"
+SLOT="0"
+

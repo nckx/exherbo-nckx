@@ -1,0 +1,18 @@
+# Use an alternative git repository that is only updated when the test suite
+# completes successfully. Otherwise identical to arbor's systemd.
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Based on work by Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v3
+
+# We need $FILES to point to the parent repository's files/ directory
+FILES="${REPODIR}"/packages/${CATEGORY}/${PN}/files
+require systemd
+
+# Using 'require github' here doesn't work, because we're being naughty and
+# overriding scm-git settings already "applied" in systemd.exlib. We must
+# be cautious, and repeat the same sequence here:
+SCM_REPOSITORY="https://github.com/${PN}/${PN}.git"
+require scm-git
+
+PLATFORMS="~amd64"
+

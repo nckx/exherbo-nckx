@@ -1,0 +1,26 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="Long-Range ZIP"
+DESCRIPTION="
+Compression program optimised for large files. The larger the file and the
+more memory you have, the better the compression advantage this will
+provide, especially once the files are larger than 100MB. The advantage can
+be chosen to be either size (much smaller than bzip2) or speed (much faster
+than bzip2)."
+HOMEPAGE="http://ck.kolivas.org/apps/${PN}/"
+LICENCES="GPL-2"
+SLOT="0"
+
+DEPENDENCIES="
+    build+run:
+        app-arch/bzip2
+        app-arch/lzo
+        sys-libs/zlib
+"
+
+# Note: only useful on x86
+DEFAULT_SRC_CONFIGURE_PARAMS+=( --enable-asm )
+

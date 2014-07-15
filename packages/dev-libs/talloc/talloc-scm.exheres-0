@@ -1,0 +1,22 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require samba-component
+
+SUMMARY="Hierarchical pool based memory allocator with destructors"
+DESCRIPTION="
+Talloc is a hierarchical pool based memory allocator with destructors. It is the core memory
+allocator used in Samba, and has made a huge difference in many aspects of Samba4 development.
+"
+LICENCES="LGPL-3"
+
+DEPENDENCIES="
+    build:
+        (
+            app-text/docbook-xml-dtd:4.2
+            dev-libs/libxslt
+        ) [[ description = [ Need xsltproc to build the manual page ] ]]
+"
+
+PLATFORMS="~amd64"
+

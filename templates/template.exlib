@@ -1,0 +1,78 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+# Based on work by 
+
+require  systemd-service
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY=""
+DESCRIPTION="
+"
+HOMEPAGE="http://${PN}"
+REMOTE_IDS="freecode:${PN}"
+UPSTREAM_CHANGELOG="${HOMEPAGE}"
+UPSTREAM_RELEASE_NOTES="${HOMEPAGE}"
+UPSTREAM_DOCUMENTATION="
+    http://[[ description = [  ] ]]
+"
+LICENCES="GPL-2"
+SLOT="0"
+
+MYOPTIONS="
+    foo [[ description = [ bar ] ]]
+"
+DEPENDENCIES="
+    build:
+    build+run:
+        foo/bar[>=] [[ note = [ required for foo ] ]]
+        !foo/baz[>=] [[
+            description = [ foo/bar collides ]
+            resolution = manual|uninstall-blocked-after
+        ]]
+        foo? ( bar/foo[>=] )
+"
+
+RESTRICT="test"
+
+DEFAULT_SRC_PREPARE_PATCHES+=(
+    -p? "${FILES}"/.patch
+)
+
+DEFAULT_SRC_CONFIGURE_PARAMS+=( --enable- )
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES+=( 'foo bar' baz )
+DEFAULT_SRC_CONFIGURE_OPTION_WITHS+=( 'foo bar' baz )
+
+DEFAULT_SRC_COMPILE_PARAMS+=(  )
+
+DEFAULT_SRC_INSTALL_PARAMS+=(  )
+DEFAULT_SRC_INSTALL_EXTRA_DOCS+=(  )
+
+export_exlib_phases pkg_setup src_prepare src_configure src_compile src_install pkg_postinst
+
+_pkg_setup() {
+    exdirectory --allow /foo
+
+    default
+}
+
+_src_prepare() {
+    default
+}
+
+_src_configure() {
+    default
+}
+
+_src_compile() {
+    default
+}
+
+_src_install() {
+    default
+}
+
+_pkg_postinst() {
+    default
+}
+

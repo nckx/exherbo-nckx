@@ -1,0 +1,17 @@
+#!/bin/sh
+##
+## Copy this file to .git/hooks/pre-commit and make it executable.
+##
+
+# Immediately fail on any error
+set -e
+
+# Redirect output to stderr
+exec 1>&2
+
+# Update category list
+(
+	cd packages
+	rmdir * 2>/dev/null || :
+	ls > ../metadata/categories.conf
+)

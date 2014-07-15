@@ -1,0 +1,175 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+# Based on work by Bryan Østergaard <bryan.ostergaard@gmail.com>
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="GRand Unified Boot loader"
+UPSTREAM_DOCUMENTATION="
+    http://grub.enbug.org/             [[ description = [ GNU Grub Wiki ] ]]
+    http://grub.enbug.org/TestingOnX86 [[ description = [ Installing Grub 2
+        on x86 ] ]]
+"
+LICENCES="GPL-3"
+SLOT="0"
+
+if ever is_scm; then
+    SCM_REPOSITORY="git://git.savannah.gnu.org/grub.git"
+    SCM_SECONDARY_REPOSITORIES="extras"
+    SCM_extras_REPOSITORY="git://git.savannah.gnu.org/grub-extras.git"
+    SCM_extras_UNPACK_TO="${WORK}/grub-extras"
+    require scm-git
+fi
+
+MYOPTIONS="
+    device-mapper [[ description = [ Ability to detect and use device-mapper
+        devices ] ]]
+    efi           [[ description = [ Build for EFI platform ] ]]
+    grub-extras   [[ description = [ Build out-of tree modules with extra
+        functionality ] ]]
+    grub-mount    [[ description = [ FUSE driver for filesystems that GRUB
+        understands ] ]]
+    minimal       [[ description = [ Do not install /etc/grub.d,
+        grub-mkconfig and such ] ]]
+    mkfont        [[ description = [ Build grub-mkfont which can create GRUB
+        font files ] ]]
+    themes        [[ description = [ Include bundled themes ] ]]
+"
+DEPENDENCIES="
+    build:
+        sys-apps/help2man [[ note = [ man pages won't get created otherwise
+            resulting in empty man dirs ] ]]
+        sys-devel/bison
+        sys-devel/flex[>=2.5.35]
+        sys-devel/make
+        device-mapper? ( sys-fs/lvm2 )
+        grub-mount? ( sys-fs/fuse )
+        mkfont? (
+            fonts/unifont
+            media-libs/freetype:2
+        )
+    build+run:
+        app-arch/xz
+        sys-apps/systemd
+        sys-devel/gettext [[ note = [ required for grub-mkconfig, grep
+            gettext in /etc/grub.d ] ]]
+        !sys-boot/grub-static [[ description = [ /sbin/grub-install collides ]
+            resolution = manual ]]
+    suggestion:
+        sys-boot/os-prober [[ description = [ Ability to add other OSs
+            automatically to grub.cfg via grub-mkconf ] ]]
+"
+# FIXME this is ugly; is it right?
+if ever is_scm; then
+    DEPENDENCIES+="
+        build:
+            sys-devel/autogen
+    "
+fi
+
+
+# TODO: needs qemu-system-i386
+RESTRICT="test"
+
+require bash-completion flag-o-matic
+
+DEFAULT_SRC_PREPARE_PATCHES+=(
+        "${FILES}/fedora-patches/0073-blscfg-add-blscfg-module-to-parse-Boot-Loader-Specif.patch"
+        "${FILES}/0076-Don-t-write-messages-to-the-screen.nckx.patch"
+        "${FILES}/fedora-patches/0077-Don-t-print-GNU-GRUB-header.patch"
+        "${FILES}/fedora-patches/0078-Don-t-add-to-highlighted-row.patch"
+        "${FILES}/fedora-patches/0079-Don-t-add-to-highlighted-row.patch"
+        "${FILES}/fedora-patches/0080-Message-string-cleanups.patch"
+        "${FILES}/fedora-patches/0081-Fix-border-spacing-now-that-we-aren-t-displaying-it.patch"
+        "${FILES}/fedora-patches/0082-Use-the-correct-indentation-for-the-term-help-text.patch"
+        "${FILES}/fedora-patches/0083-Indent-menu-entries.patch"
+        "${FILES}/fedora-patches/0084-Fix-margins.patch"
+        "${FILES}/fedora-patches/0087-Use-2-instead-of-1-for-our-right-hand-margin-so-line.patch"
+        "${FILES}/fedora-patches/0092-Don-t-draw-a-border-around-the-menu.patch"
+        "${FILES}/fedora-patches/0093-Use-the-standard-margin-for-the-timeout-string.patch"
+        "${FILES}/fedora-patches/0100-Don-t-emit-Booting-.-message.patch"
+        "${FILES}/fedora-patches/0111-Reduce-timer-event-frequency-by-10.patch"
+        "${FILES}/0010-nckx-dont-print-dots.patch"
+        "${FILES}/0020-nckx-modifier-key-message-early.patch"
+        "${FILES}/0078-nckx-Don-t-add-to-highlighted-row.patch"
+)
+DEFAULT_SRC_CONFIGURE_PARAMS+=(
+    CPP="${CC} -E"
+    --prefix=/
+    --datarootdir=/usr/share
+    --with-bootdir=/boot
+    --with-grubdir=grub
+
+    --enable-liblzma
+    --disable-libzfs
+    --disable-themes
+    --disable-werror
+
+    --enable-boot-time
+    --enable-cache-stats
+    --disable-efiemu
+    --disable-grub-emu-pci
+    --disable-grub-emu-sdl
+    --disable-grub-emu-usb
+)
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES+=(
+    'device-mapper'
+    'grub-mount'
+    'mkfont grub-mkfont'
+    'themes'
+)
+
+export_exlib_phases pkg_setup src_prepare src_configure src_install pkg_postinst
+
+grub_pkg_setup() {
+    # optimizations other than -Os/-Oz may result in oversized core images
+    replace-flags -O[^z] -Os
+}
+
+grub_src_prepare() {
+    default
+
+    if option grub-extras; then
+        export GRUB_CONTRIB=grub-extras
+    fi
+
+    if ever is_scm; then
+        edo ./autogen.sh
+
+        esandbox disable_net
+        edo ./linguas.sh
+        esandbox enable_net
+
+        # By default, GRUB uses the entirely fictitious C.UTF-8 locale
+        edo find po -type f -exec sed "s|C.UTF-8|en_US.UTF-8|g" -i {} \;
+    fi
+}
+
+grub_src_configure() {
+    if option efi; then
+        DEFAULT_SRC_CONFIGURE_PARAMS+=( --with-platform=efi )
+    fi
+
+    default
+}
+
+grub_src_install() {
+    default
+
+    edo rm "${IMAGE}"/etc/bash_completion.d/${PN}
+    edo rmdir "${IMAGE}"/etc/bash_completion.d/
+    dobashcompletion "${WORK}"/util/bash-completion.d/${PN}
+
+    if option minimal; then
+        edo rm "${IMAGE}"/sbin/grub-mkconfig \
+               "${IMAGE}"/usr/share/man/man8/grub-mkconfig.8
+        edo rm -r "${IMAGE}"/etc/grub.d/
+        edo rmdir "${IMAGE}"/etc
+    fi
+}
+
+grub_pkg_postinst() {
+    elog "GRUB still needs to be (re-)installed on all boot devices by running:"
+    elog "# grub-install [OPTION]... /dev/<DEVICE>"
+}
+

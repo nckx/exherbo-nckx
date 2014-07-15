@@ -1,0 +1,15 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require ntfs-3g_ntfsprogs
+
+SCM_REPOSITORY="git://ntfs-3g.git.sourceforge.net/gitroot/ntfs-3g/ntfs-3g"
+SCM_BRANCH="edge"
+require scm-git
+
+PLATFORMS="~amd64"
+
+src_prepare() {
+    edo ./autogen.sh
+}
+

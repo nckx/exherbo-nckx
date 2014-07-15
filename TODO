@@ -1,0 +1,11 @@
+* Paludis doesn't seem to run pkg_p{re,ost}rm on package upgrades. Find out
+  whether this is a bug or a(n un)documented feature.
+
+* Find a better solution for x509.genkey than the current symbolic link hack.
+
+* Actually, find a better solution for module signing keys in general.
+
+  They're really worthless if kept around on the build host (any malware could
+  use them to sign its modules), but deleting them after building the kernel
+  makes it impossible to sign out-of-tree modules. That *is* the point, but...
+  bleh.

@@ -1,0 +1,10 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require mcelog
+
+SCM_REPOSITORY="git://git.kernel.org/pub/scm/utils/cpu/mce/${PN}.git"
+require scm-git
+
+PLATFORMS="~amd64"
+

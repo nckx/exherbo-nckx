@@ -1,0 +1,27 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="FUSE filesystem which transcodes audio formats to MP3"
+DESCRIPTION="
+MP3FS is a read-only FUSE filesystem which transcodes audio formats
+(currently FLAC) to MP3 on the fly when opened and read. Just use your
+favourite file browser to select the files you want encoded and copy them
+somewhere!
+"
+HOMEPAGE="http://khenriks.github.com/mp3fs/"
+LICENCES="GPL-3"
+SLOT="0"
+
+DEPENDENCIES="
+    build+run:
+        media-libs/flac[>=1.1.4]
+        media-sound/lame
+        media-libs/libid3tag
+        sys-fs/fuse[>=2.6.0]
+"
+
+# Tests require libavcodec
+RESTRICT="test"
+

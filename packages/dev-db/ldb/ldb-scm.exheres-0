@@ -1,0 +1,30 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require samba-component
+
+SUMMARY="LDAP-like embedded database"
+DESCRIPTION="
+ldb is a LDAP-like embedded database. It is not at all LDAP standards
+compliant, so if you want a standards compliant database then please see the
+excellent OpenLDAP project.
+What ldb does is provide a fast database with an LDAP-like API designed to be
+used within an application. In some ways it can be seen as a intermediate
+solution between key-value pair databases and a real LDAP database.
+
+ldb is the database engine used in Samba4.
+"
+LICENCES="LGPL-3"
+
+DEPENDENCIES="
+    build+run:
+        dev-db/tdb[~scm]
+        dev-libs/popt
+        dev-libs/talloc
+        dev-libs/tevent
+    recommendation:
+        net-directory/openldap [[ description = [ ldb can use OpenLDAP as a backend ] ]]
+"
+
+PLATFORMS="~amd64"
+

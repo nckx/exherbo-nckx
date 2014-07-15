@@ -1,0 +1,28 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require duff github [ user=elmindreda ]
+
+PLATFORMS="~amd64"
+
+DEPENDENCIES="
+    build+run:
+        sys-devel/autoconf-wrapper
+        sys-devel/gettext
+"
+
+src_prepare() {
+    # gettexttize refuses to run for no good reason, force it to.
+    # Authors should shoot themselves in the knee and send us a picture.
+    edo cp "$( type -p gettextize )" .
+    edo sed 's@read .*/dev/tty.*@echo "(Skipping)"@' -i gettextize
+    edo ./gettextize
+
+    edo sed 's@po/Makefile.in\( .*\)po/Makefile.in@po/Makefile.in \1@' \
+            -i configure.ac # FIXME if upstream ever get their shit together
+
+    edo autoreconf -i
+
+    default
+}
+

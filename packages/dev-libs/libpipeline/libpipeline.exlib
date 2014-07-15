@@ -1,0 +1,20 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+# Based on work by Hong Hao <oahong@gmail.com>
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="Pipeline manipulation library"
+HOMEPAGE="http://${PN}.nongnu.org"
+LICENCES="GPL-3"
+SLOT="0"
+
+require systemd-service
+
+DEPENDENCIES="
+    build:
+        virtual/pkg-config
+    test:
+        dev-libs/check[>=0.9.4]
+"
+

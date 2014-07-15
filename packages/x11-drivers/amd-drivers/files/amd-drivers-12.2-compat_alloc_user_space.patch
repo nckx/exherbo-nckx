@@ -1,0 +1,11 @@
+--- ../fglrx-11.5.orig/kcl_ioctl.c	2011-05-15 08:18:53.000000000 +0200
++++ kcl_ioctl.c	2011-05-15 08:26:19.053389681 +0200
+@@ -219,7 +219,7 @@
+  */
+ void* ATI_API_CALL KCL_IOCTL_AllocUserSpace32(long size)
+ {
+-    void __user *ret = COMPAT_ALLOC_USER_SPACE(size);
++    void __user *ret = arch_compat_alloc_user_space(size);
+ 
+     /* prevent stack overflow */
+     if (!access_ok(VERIFY_WRITE, ret, size))

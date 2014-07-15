@@ -1,0 +1,12 @@
+--- amd-drivers-11.5/common/lib/modules/fglrx/build_mod/2.6.x/Makefile.orig	2011-05-15 08:57:18.297388622 +0200
++++ amd-drivers-11.5/common/lib/modules/fglrx/build_mod/2.6.x/Makefile	2011-05-15 08:57:23.489388619 +0200
+@@ -101,6 +101,9 @@
+ clean::
+ 	rm -rf *.c *.h *.o *.ko *.a .??* *.symvers
+ 
++install:: fglrx.ko
++	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules_install
++
+ endif
+ 
+ # ### EOF ###

@@ -1,0 +1,105 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+# Based on work by Santiago M. Mola & Gentoo Foundation
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="Fast, light-weight text-mode and graphical web browser"
+DESCRIPTION="
+Links runs in graphics mode (mouse required) on X Window System (UN*X,
+Cygwin), SVGAlib, Linux Framebuffer, OS/2 PMShell, AtheOS GUI
+Links runs in text mode (mouse optional) on UN*X console, ssh/telnet virtual
+terminal, vt100 terminal, xterm, and virtually any other text terminal.
+Mouse is supported for GPM, xterm, and OS/2. Links supports colors on terminal.
+HTML 4.0 support (without CSS), HTTP 1.1 support
+Tables, frames in both graphics and text mode, image display in graphics mode
+Builtin image display for GIF, JPEG, PNG, XBM, TIFF in graphics mode
+And more...
+"
+HOMEPAGE="http://${PN}.twibright.com/"
+REMOTE_IDS="freecode:${PN}"
+UPSTREAM_CHANGELOG="${HOMEPAGE%/}/download/ChangeLog"
+LICENCES="GPL-2"
+SLOT="2"
+
+MYOPTIONS="
+    X
+    fbcon [[ requires = gpm ]]
+    gpm
+    jpeg
+    tiff
+
+    jpeg? ( ( X fbcon ) [[ number-selected = at-least-one ]] )
+    tiff? ( ( X fbcon ) [[ number-selected = at-least-one ]] )
+"
+
+# Note: if X or fbcon options are enabled, links will be built in graphic
+# mode, which requires libpng (not required in text mode), so add libpng
+# for X? and fbcon?
+# TODO:
+#   directfb? ( dev-libs/DirectFB )
+#   sdl? ( >=media-libs/libsdl-1.2.0 )
+#   svga? ( >=media-libs/svgalib-1.4.3 )
+# sdl: support dropped until someone takes care
+DEPENDENCIES="
+    build:
+        virtual/pkg-config
+    build+run:
+        sys-libs/ncurses
+        X? ( x11-libs/libXext
+            media-libs/libpng[>=1.2.1]
+            jpeg? ( media-libs/jpeg[>=6b] )
+            tiff? ( media-libs/tiff[>=3.5.7] ) )
+        fbcon? ( media-libs/libpng[>=1.2.1]
+            jpeg? ( media-libs/jpeg[>=6b] )
+            tiff? ( media-libs/tiff[>=3.5.7] ) )
+        gpm? ( sys-libs/gpm )
+        dev-libs/openssl[>=0.9.6c]
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --hates=docdir
+    --with-bzip2
+    --with-zlib
+    --with-ssl
+)
+DEFAULT_SRC_INSTALL_EXTRA_DOCS+=( BRAILLE_HOWTO KEYS SITES )
+
+export_exlib_phases src_configure src_install
+
+links2_src_configure() {
+    # Work around broken upstream not finding libpng
+    CFLAGS+=" ${CPPFLAGS}"
+    unset CPPFLAGS
+
+    local graphics
+    if option X || option fbcon; then
+        graphics=(
+            --enable-graphics
+            $( option_with jpeg libjpeg )
+            $( option_with tiff libtiff )
+        )
+    else
+        graphics=(
+            --disable-graphics
+        )
+    fi
+
+    econf "${DEFAULT_SRC_CONFIGURE_PARAMS[@]}" \
+          "${graphics[@]}" \
+          $( option_with X x ) \
+          $( option_with fbcon fb ) \
+          $( option_with gpm )
+}
+
+links2_src_install() {
+    default
+
+    if option X; then
+        insinto /usr/share/pixmaps
+        doins graphics/links.xpm
+    fi
+
+    dodoc -r doc/links_cal
+}
+

@@ -1,0 +1,6 @@
+[Unit]
+Description=Swat (Samba web configuration interface) daemon
+
+[Service]
+ExecStart=/usr/sbin/swat
+StandardInput=socket

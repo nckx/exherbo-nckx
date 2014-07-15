@@ -1,0 +1,26 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require linux-firmware
+
+SUMMARY="Firmware for RealTek wireless network cards"
+DESCRIPTION="
+Binary firmware blobs required to use many RealTek wireless network cards
+with Linux.
+"
+LICENCES="rtlwifi_firmware"
+
+PLATFORMS="~amd64"
+
+DEFAULT_SRC_INSTALL_EXTRA_DOCS+=( LICENCE.${LICENCES}.txt )
+
+src_install() {
+    linux-firmware_src_install
+
+    ##
+    ## EXPERIMENTAL firmware that may break devices I don't own:
+    ##
+    insinto "${LINUX_FIRMWARE_PATH}"/"${LINUX_FIRMWARE_SUBDIRECTORY}"
+    newins "${FILES}"/rtl8712u-most-recent-v2.6.6-bad.bin rtl8712u.bin
+}
+

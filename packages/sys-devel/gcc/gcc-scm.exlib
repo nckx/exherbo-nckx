@@ -1,0 +1,32 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+SCM_REPOSITORY="git://gcc.gnu.org/git/gcc.git"
+MY_BRANCH="${PV%-scm}"
+if [[ "${MY_BRANCH}" ]]; then
+    SCM_BRANCH="gcc-${MY_BRANCH//./_}-branch"
+fi
+require scm-git
+
+require gcc
+DOWNLOADS=
+SLOT="${PV}"
+
+export_exlib_phases src_unpack
+
+gcc-scm_src_unpack() {
+    scm_src_unpack
+    gcc_src_unpack
+
+    read MY_PV <"${WORKBASE}"/${PNV}/gcc/BASE-VER
+}
+
+##
+## arbor's gcc.exlib uses ${SLOT} as the alternatives priority. This works
+## only if ${SLOT} is a numerical value, which ours isn't. Use some bash
+## sorcery to modify the exlib code post facto:
+##
+__gcc_provide_slot_alternatives="$(declare -f __gcc_provide_slot_alternatives)"
+eval "${__gcc_provide_slot_alternatives/'"${SLOT}" "${SLOT}"'/'"${SLOT}" 0'}"
+unset __gcc_provide_slot_alternatives
+

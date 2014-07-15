@@ -1,0 +1,39 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+require systemd-service
+
+SUMMARY="Process x86 machine checks (in particular memory and CPU hardware errors)"
+DESCRIPTION="
+mcelog is required by both 32bit x86 Linux kernels (since 2.6.30) and 64bit
+Linux kernels (since early 2.6 kernel releases) to log machine checks and
+should run on all Linux systems that need error handling. 
+ 
+The mcelog daemon accounts memory and some other errors errors in various
+ways. mcelog --client can be used to query a running daemon. The daemon
+can also execute triggers when configurable error thresholds are exceeded.
+This is used to implement a range of automatic predictive failure analysis
+algorithms: including bad page offlining and automatic cache error
+handling. User defined actions can be also configured. 
+  
+The modern way to run it is to start it at boot up time and run it
+as a daemon. In addition it can be used to decode fatal machine
+checks on the command line (but this is also usually not needed anymore on
+modern kernels which log those after reboot automatically)
+"
+HOMEPAGE="http://${PN}.org"
+LICENCES="GPL-2"
+SLOT="0"
+
+RESTRICT="test" # FIXME: must be run as root
+
+export_exlib_phases src_install
+
+mcelog_src_install() {
+    default
+
+    install_systemd_files
+}
+

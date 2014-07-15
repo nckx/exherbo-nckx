@@ -1,0 +1,44 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+myexparam component=${PN}
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+REMOTE_IDS="freecode:${PN}"
+LICENCES="GPL-3"
+SLOT="0"
+
+EXLIB_PN="samba"
+if ever is_scm; then
+    SCM_REPOSITORY="git://git.${EXLIB_PN}.org/${EXLIB_PN}.git"
+    SCM_CHECKOUT_TO=${EXLIB_PN}
+    require scm-git
+else
+    DOWNLOADS="mirror://${EXLIB_PN}/../${PN}/${PNV}.tar.gz"
+fi
+
+require python [ python_dep=2.6 ] \
+        waf [ waf_executable="${WORK}/buildtools/bin/waf" ]
+
+case ${PN} in
+    ${EXLIB_PN})    HOMEPAGE="www" ;;
+    *)              HOMEPAGE=${PN}
+                    exparam -v SAMBA_COMPONENT component
+                    WORK+=/lib/${SAMBA_COMPONENT} ;;
+esac
+HOMEPAGE="http://${HOMEPAGE}.${EXLIB_PN}.org"
+
+WAF_SRC_CONFIGURE_PARAMS+=(
+    --jobs=${EXJOBS:-1}
+    --disable-rpath{,-install}
+    --builtin-libraries=NONE
+    --bundled-libraries=NONE
+    --localstatedir=/var
+    --sysconfdir=/etc
+)
+
+WAF_SRC_INSTALL_PARAMS=(
+    --jobs=${EXJOBS:-1}
+)
+

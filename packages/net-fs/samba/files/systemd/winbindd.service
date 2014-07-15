@@ -1,0 +1,9 @@
+[Unit]
+Description=Samba Name Service Switch server
+
+[Service]
+ExecStart=/usr/sbin/winbindd --foreground --log-stdout
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

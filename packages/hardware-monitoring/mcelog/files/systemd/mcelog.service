@@ -1,0 +1,15 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Based on https://build.opensuse.org/package/view_file?file=mcelog.systemd&package=mcelog.790&project=openSUSE%3A12.2%3AUpdate
+
+[Unit]
+Description=Machine Check Exception Logging Daemon
+After=syslog.target
+ConditionVirtualization=false
+ConditionPathExists=/dev/mcelog
+
+[Service]
+ExecStart=/usr/sbin/mcelog --daemon --foreground --ignorenodev
+StandardOutput=syslog
+
+[Install]
+WantedBy=multi-user.target

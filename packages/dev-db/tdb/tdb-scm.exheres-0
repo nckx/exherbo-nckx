@@ -1,0 +1,15 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require samba-component
+
+SUMMARY="Simple database API"
+LICENCES="LGPL-3"
+
+DEPENDENCIES="
+    build+run:
+        dev-libs/libreplace[~scm]
+"
+
+PLATFORMS="~amd64"
+

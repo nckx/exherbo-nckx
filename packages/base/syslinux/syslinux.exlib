@@ -1,0 +1,43 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="Suite of lightweight bootloaders"
+DESCRIPTION="
+The Syslinux Project covers lightweight bootloaders for MS-DOS FAT
+filesystems (SYSLINUX), network booting (PXELINUX), bootable El Torito
+CD-ROMs (ISOLINUX), and Linux ext2/ext3/ext4 or btrfs filesystems
+(EXTLINUX). The project also includes MEMDISK, a tool to boot legacy
+operating systems (such as DOS) from nontraditional media; it is
+usually used in conjunction with PXELINUX and ISOLINUX.
+"
+HOMEPAGE="http://www.syslinux.org/"
+
+if ever is_scm; then
+    SCM_REPOSITORY="git://git.kernel.org/pub/scm/boot/syslinux/syslinux.git"
+    SCM_EXTERNAL_REFS="gnu-efi:gnu_efi"
+    SCM_SECONDARY_REPOSITORIES="gnu_efi"
+    SCM_gnu_efi_REPOSITORY="git://git.code.sf.net/p/gnu-efi/code"
+    require scm-git
+fi
+
+LICENCES="GPL-2"
+SLOT="0"
+
+DEPENDENCIES="
+    build:
+        dev-lang/nasm
+    run:
+        sys-fs/mtools
+"
+
+DEFAULT_SRC_INSTALL_PARAMS=( INSTALLROOT="${IMAGE}" MANDIR=/usr/share/man )
+DEFAULT_SRC_INSTALL_EXTRA_DOCS=( doc/*.txt )
+
+export_exlib_phases src_prepare
+
+syslinux_src_prepare() {
+    emake clean
+}
+

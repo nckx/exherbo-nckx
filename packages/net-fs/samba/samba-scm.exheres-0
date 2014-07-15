@@ -1,0 +1,142 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+# Based partly on valuable work by Pierre Lejeune & Wulf C. Krueger
+
+SUMMARY="Samba provides seamless file and print services to SMB/CIFS clients, e. g. Windows"
+DESCRIPTION="
+Samba is a free software implementation of the SMB/CIFS networking protocol
+that can be run on many platforms other than Microsoft Windows.
+
+It allows hosts to interact with a Microsoft Windows client or server as if
+they are Windows file and print servers. Additionally, they can act as PDCs,
+domain member servers or as a parts of an Active Directory.
+"
+
+MYOPTIONS="
+    acl
+    ads [[ requires = [ ldap ] description = [ Enable Active Directory support ] ]]
+    async [[ description = [ Enables asynchronous input/output ] ]]
+    avahi [[ description = [ Enable Avahi support ] ]]
+    cluster [[ description = [ Enable the Samba cluster extensions ] ]]
+    cups
+    gnutls
+    ldap
+    quotas [[ description = [ Enables support for user quotas ] ]]
+    swat
+    syslog    [[ description = [ Enables support for syslog ] ]]
+    winbind [[ description = [ Enables support for the winbind auth daemon ] ]]
+"
+DEPENDENCIES="
+    build:
+        dev-lang/perl:*
+    build+run:
+        app-arch/libarchive
+        app-crypt/heimdal[>=1.5]
+        dev-db/ldb[>=1.1.16]
+        dev-db/tdb[~scm]
+        dev-db/ntdb[~scm]
+        dev-libs/iniparser
+        dev-libs/libgcrypt
+        dev-libs/libgpg-error
+        dev-libs/popt
+        dev-libs/talloc[>=2.0.5]
+        dev-libs/tevent[>=0.9.18]
+        dev-util/subunit
+        net-libs/cyrus-sasl
+        net-libs/nss_wrapper[~scm]
+        sys-libs/libcap
+        sys-libs/pam
+        sys-libs/readline
+        acl? (
+            sys-apps/acl
+            sys-apps/attr
+        )
+        async? ( dev-libs/libaio )
+        avahi? ( net-dns/avahi )
+        cluster? ( dev-libs/ctdb )
+        cups? ( net-print/cups )
+        gnutls? ( dev-libs/gnutls )
+        ldap? ( net-directory/openldap )
+        syslog? ( virtual/syslog )
+"
+
+PLATFORMS="~amd64"
+
+require samba-component pam systemd-service
+
+WAF_SRC_CONFIGURE_PARAMS+=(
+    --bundled-libraries=socket_wrapper
+
+    --enable-fhs
+    --with-lockdir=/run/lock/${PN}
+    --with-modulesdir=/usr/${LIBDIR}/${PN}
+    --with-pammodulesdir=$( getpam_mod_dir )
+    --with-piddir=/run/${PN}
+    --with-privatedir=/var/lib/${PN}/private
+    --with-sockets-dir=/run/${PN}
+
+    --enable-pthreadpool
+    --disable-glusterfs
+    --nopyc
+    --nopyo
+    --with-automount
+    --with-iconv
+    --with-libarchive
+    --with-pam
+    --with-pam_smbpass
+    --with-sendfile-support
+    --with-utmp
+    --with-regedit
+    --without-dmapi
+    --without-fam
+)
+WAF_SRC_CONFIGURE_OPTION_ENABLES+=(
+    avahi
+    cups
+    "cups iprint"
+    gnutls
+)
+WAF_SRC_CONFIGURE_OPTION_WITHS+=(
+    "acl acl-support"
+    ads
+    "ads dnsupdate"
+    "async aio-support"
+    "cluster cluster-support"
+    ldap
+    quotas # typo kept for compatibility
+    winbind
+)
+
+# FIXME: Heimdal on Exherbo doesn't provide a separate krb5-config.heimdal
+# causing WAF to use embedded Heimdal instead. This hack avoids that:
+PATH+=:"${WORK}"/custom-bin
+src_prepare() {
+    edo mkdir custom-bin
+    edo ln -s /usr/bin/krb-config custom-bin/krb5-config.heimdal
+}
+
+src_install() {
+    waf_src_install
+    python_bytecompile
+
+    install_systemd_files
+    if option systemd; then
+        if ! option swat; then
+            edo rm "${IMAGE}"/"${SYSTEMDSYSTEMUNITDIR}"/swat{@.service,.socket}
+        fi
+        if ! option winbind; then
+            edo rm "${IMAGE}"/"${SYSTEMDSYSTEMUNITDIR}"/winbindd.service
+        fi
+        insinto /usr/${LIBDIR}/tmpfiles.d
+        hereins ${PN}.conf <<< "d /run/${PN} 0755 root root -"
+    fi
+
+    keepdir /var/{cache,lib,log}/${PN}
+    edo rmdir "${IMAGE}"/run/{lock/{${PN},},{${PN},}}
+
+    keepdir /var/lib/samba/private/smbd.tmp/messaging
+
+    insinto /etc/${PN}
+    newins "${WORK}"/examples/smb.conf.default smb.conf
+}
+

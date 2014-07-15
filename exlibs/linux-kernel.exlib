@@ -1,0 +1,138 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+myexparam release=${PV}
+
+SUMMARY="Linux kernel"
+DESCRIPTION="
+Linux is a clone of the operating system Unix, written from scratch by
+Linus Torvalds with assistance from a loosely-knit team of hackers across
+the Net. It aims towards POSIX and Single UNIX Specification compliance.
+It has all the features you would expect in a modern fully-fledged Unix,
+including true multitasking, virtual memory, shared libraries, demand
+loading, shared copy-on-write executables, proper memory management,
+and multistack networking including IPv4 and IPv6.
+"
+HOMEPAGE="https://www.kernel.org/"
+
+exparam -v LINUX_KERNEL_RELEASE release
+if [[ ! "${LINUX_KERNEL_RELEASE}" ]]; then
+    LINUX_KERNEL_RELEASE=${PV%-*}
+fi
+
+if ever is_scm; then
+    if [[ ! "${SCM_REPOSITORY}" ]]; then
+        SCM_REPOSITORY="git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
+        require scm-git
+    fi
+
+    SLOT="scm"
+else
+    DOWNLOADS="${HOMEPAGE%/}/pub/linux/kernel/v${LINUX_KERNEL_RELEASE%%.*}.x"
+    UPSTREAM_CHANGELOG="${DOWNLOADS}/ChangeLog-${LINUX_KERNEL_RELEASE}"
+    DOWNLOADS+="/linux-${LINUX_KERNEL_RELEASE}.tar.xz"
+
+    SLOT="${LINUX_KERNEL_RELEASE%.*}"
+
+    WORK="${WORKBASE}/linux-${LINUX_KERNEL_RELEASE}"
+fi
+
+UPSTREAM_DOCUMENTATION="
+    ${HOMEPAGE%/}/category/faq.html [[ description = [ Frequently Asked Questions ] ]]
+"
+LICENCES="GPL-2"
+SLOT="0"
+
+DEPENDENCIES="
+    build:
+        sys-apps/bc
+"
+
+export_exlib_phases src_prepare src_configure src_compile src_install pkg_postinst pkg_postrm
+
+linux-kernel_src_prepare() {
+    default
+
+    emake mrproper
+}
+
+linux-kernel_src_configure() {
+    default
+
+    local from to
+    for from in config:.config x509.genkey; do
+        to="${from#*:}"
+        from="${FILES}/${from%%:*}"
+        if [[ -f "${from}" ]]; then
+            edo cp "${from}" "${to}"
+        fi
+    done
+
+    while echo; do :; done | emake ARCH="${HOSTTYPE}" oldconfig
+
+    local config_hash="$( grep -E "^(|# )CONFIG_" .config | sha1sum )"
+    edo sed \
+        -e 's|-dirty||g' \
+        -e 's|^echo "\$res"$|&"-c'"${config_hash:0:7}"'"|' \
+        -i scripts/setlocalversion
+}
+
+linux-kernel_src_compile() {
+    emake ARCH="${HOSTTYPE}"
+}
+
+linux-kernel_src_install() {
+    read LINUX_KERNEL_RELEASE < include/config/kernel.release
+    local MODDIR="${LIBDIR}/modules/${LINUX_KERNEL_RELEASE}"
+
+    emake ARCH="${HOSTTYPE}" INSTALL_MOD_PATH="${IMAGE}" modules_install
+    ## Paludis forbids using /lib if it is a symlink (e.g. to /lib64)
+    ## Since /lib{32,64} is a hack that will hopefully go away, simply
+    ## rename it silently without bothering anyone else:
+    nonfatal edo mv "${IMAGE}"/{lib,"${LIBDIR}"}
+    ## We don't install sources, so remove these bogus links
+    edo rm -f "${IMAGE}/${MODDIR}"/{build,source}
+
+    LINUX_KERNEL_IMAGE=linux
+    insinto /"${MODDIR}"
+    insopts -m0644 -o root -g root
+    newins \
+        "$( readlink -m "arch/${HOSTTYPE}/boot/bzImage" )" \
+        "${LINUX_KERNEL_IMAGE}"
+    doins System.map
+
+    export \
+        LINUX_KERNEL_RELEASE \
+        LINUX_KERNEL_IMAGE="/${MODDIR}/${LINUX_KERNEL_IMAGE}"
+}
+
+linux-kernel_pkg_postinst() {
+    if [[ ! "${ROOT%/}" ]]; then
+        dracut() { "$( type -P dracut )" --force "${@}"; }
+        export -f dracut
+
+        edo kernel-install add "${LINUX_KERNEL_RELEASE}" \
+            "${LINUX_KERNEL_IMAGE}"
+    fi
+}
+
+linux-kernel_pkg_postrm() {
+    if [[ ! "${ROOT%/}" ]]; then
+        # from 'man kernel-install': "kernel-install removes the entire
+        # directory /boot/MACHINE-ID/KERNEL-VERSION/ afterwards"
+        edo kernel-install remove "${LINUX_KERNEL_RELEASE}"
+    fi
+
+    # But, as if it doesn't already do a horrible job at what it *does* do,
+    # kernel-install forgets to remove half of what it installs. Oopsie!
+    # THIS IS WHAT HAPPENS WHEN YOU LET RED HAT WRITE SOFTWARE, PEOPLE
+
+    # FIXME: this code has to make too many assumptions about system policy :(
+    # From the same man page: "The kernel-install plugin 50-depmod.install
+    # runs depmod for the KERNEL-VERSION." Because, again: utter idiots.
+    MODDIR="${LINUX_KERNEL_IMAGE%/*}"
+    edo rm -rf ${ROOT}/"${MODDIR}"
+}
+

@@ -1,0 +1,14 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+require linux-firmware
+
+SUMMARY="Firmware for RealTek ethernet cards"
+DESCRIPTION="
+Binary firmware blobs required to use many RealTek ethernet cards
+with Linux.
+"
+LICENCES="rtl_nic"
+
+PLATFORMS="~amd64"
+

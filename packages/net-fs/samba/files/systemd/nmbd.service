@@ -1,0 +1,9 @@
+[Unit]
+Description=Samba NetBIOS over IP name server
+
+[Service]
+ExecStart=/usr/sbin/nmbd --foreground --log-stdout
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

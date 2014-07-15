@@ -1,0 +1,80 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Copyright 2011 Pierre Lejeune <superheron@gmail.com>
+# Copyright 2011-2012 Wulf C. Krueger <philantrop@exherbo.org>
+# Distributed under the terms of the GNU General Public License v3
+# Based in part upon 'ntfs-3g-2011.1.15.exheres-0', which is:
+#     Copyright 2008, 2011 Ingmar Vanhassel <ingmar@exherbo.org>
+# Based in part upon 'ntfsprogs-2.0.0.exheres-0', which is:
+#     Copyright 2009 Gaute Hope <eg@gaute.vetsj.com>
+#     Copyright 2011 Wulf C. Krueger <philantrop@exherbo.org>
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+require udev-rules [ udev_files=[ 99-ntfs-3g.rules ] ]
+
+SUMMARY="Read/write NTFS driver (ntfs-3g) and userspace tools (ntfsprogs)"
+DESCRIPTION="
+NTFS-3G is a stable, full-featured, read-write NTFS driver for Linux, Android, Mac OS X, FreeBSD,
+NetBSD, OpenSolaris, QNX, Haiku, and other operating systems. It provides safe handling of the
+Windows XP, Windows Server 2003, Windows 2000, Windows Vista, Windows Server 2008 and Windows 7 NTFS
+file systems.
+"
+BASE_URL="http://www.tuxera.com"
+HOMEPAGE="${BASE_URL}/community/ntfs-3g-download"
+REMOTE_IDS="sourceforge:ntfs-3g"
+UPSTREAM_RELEASE_NOTES="${BASE_URL}/community/release-history/"
+LICENCES="GPL-2"
+SLOT="0"
+
+MYOPTIONS="
+    acl [[ description = [ Enable POSIX ACL support (optional because it causes quite some overhead) ] ]]
+    crypto [[ description = [ Enable crypto related code and utilities ] ]]
+    debug [[ description = [ Enable debugging code and output ] ]]
+    extras [[ description = [ Additional utilities: ntfs{ck,dump_logfile,mftalloc,move,truncate,wipe} ] ]]
+"
+DEPENDENCIES="
+    build:
+        virtual/pkg-config
+    build+run:
+        sys-fs/fuse[>=2.6.0]
+        crypto? (
+            dev-libs/gnutls[>=1.4.4]
+            dev-libs/libgcrypt[>=1.2.2]
+        )
+"
+
+DEFAULT_SRC_CONFIGURE_PARAMS=(
+    --exec-prefix=/usr
+    --enable-mount-helper
+    --enable-ntfsprogs
+    --enable-xattr-mappings
+    --disable-ldconfig
+    --disable-static
+    --with-fuse=external
+    --with-uuid
+)
+DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
+    'acl posix-acls'
+    crypto
+    debug
+    extras
+)
+
+export_exlib_phases src_install
+
+ntfs-3g_ntfsprogs_src_install() {
+    default
+
+    dodir /usr/sbin
+    edo mv "${IMAGE}"/sbin/* "${IMAGE}"/usr/sbin
+    edo rmdir "${IMAGE}"/sbin
+
+    dosym /usr/sbin/mount.ntfs{-3g,}
+
+    if option extras; then
+        dosym /usr/bin/{ntfsck,fsck.ntfs}
+    fi
+
+    install_udev_files
+}
+
