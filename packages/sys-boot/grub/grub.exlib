@@ -104,6 +104,7 @@ DEFAULT_SRC_CONFIGURE_PARAMS+=(
     --disable-libzfs
     --disable-themes
     --disable-werror
+    --disable-mm-debug
 
     --enable-boot-time
     --enable-cache-stats
