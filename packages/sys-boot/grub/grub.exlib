@@ -137,6 +137,7 @@ grub_src_prepare() {
     if ever is_scm; then
         edo ./autogen.sh
 
+        # FIXME
         esandbox disable_net
         edo ./linguas.sh
         esandbox enable_net
