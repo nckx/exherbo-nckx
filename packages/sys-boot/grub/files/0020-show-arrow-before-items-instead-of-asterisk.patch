@@ -1,0 +1,30 @@
+Some ideas:
+	GRUB_UNICODE_BLACK_RIGHT_TRIANGLE
+	GRUB_UNICODE_RIGHTARROW
+	GRUB_UNICODE_BULLET (0x2022, added below)
+
+diff --git a/grub-core/normal/menu_text.c b/grub-core/normal/menu_text.c
+index 2ff2941..76fb5dc 100644
+--- a/grub-core/normal/menu_text.c
++++ b/grub-core/normal/menu_text.c
+@@ -242,7 +242,7 @@ print_entry (int y, int highlight, grub_menu_entry_t entry,
+       unicode_title[i] = ' ';
+ 
+   if (data->geo.num_entries > 1)
+-    grub_putcode (highlight ? '*' : ' ', data->term);
++    grub_putcode (highlight ? GRUB_UNICODE_BULLET : ' ', data->term);
+ 
+   grub_print_ucs4_menu (unicode_title,
+ 			unicode_title + len,
+diff --git a/include/grub/unicode.h b/include/grub/unicode.h
+index a0403e9..41dbc4f 100644
+--- a/include/grub/unicode.h
++++ b/include/grub/unicode.h
+@@ -201,6 +201,7 @@ enum
+     GRUB_UNICODE_ZWJ                       = 0x200d,
+     GRUB_UNICODE_LRM                       = 0x200e,
+     GRUB_UNICODE_RLM                       = 0x200f,
++    GRUB_UNICODE_BULLET                    = 0x2022,
+     GRUB_UNICODE_LRE                       = 0x202a,
+     GRUB_UNICODE_RLE                       = 0x202b,
+     GRUB_UNICODE_PDF                       = 0x202c,

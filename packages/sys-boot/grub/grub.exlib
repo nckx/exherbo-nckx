@@ -74,24 +74,13 @@ RESTRICT="test"
 require bash-completion flag-o-matic
 
 DEFAULT_SRC_PREPARE_PATCHES+=(
-        "${FILES}/fedora-patches/0073-blscfg-add-blscfg-module-to-parse-Boot-Loader-Specif.patch"
-        "${FILES}/0076-Don-t-write-messages-to-the-screen.nckx.patch"
-        "${FILES}/fedora-patches/0077-Don-t-print-GNU-GRUB-header.patch"
-        "${FILES}/fedora-patches/0078-Don-t-add-to-highlighted-row.patch"
-        "${FILES}/fedora-patches/0079-Don-t-add-to-highlighted-row.patch"
-        "${FILES}/fedora-patches/0080-Message-string-cleanups.patch"
-        "${FILES}/fedora-patches/0081-Fix-border-spacing-now-that-we-aren-t-displaying-it.patch"
-        "${FILES}/fedora-patches/0082-Use-the-correct-indentation-for-the-term-help-text.patch"
-        "${FILES}/fedora-patches/0083-Indent-menu-entries.patch"
-        "${FILES}/fedora-patches/0084-Fix-margins.patch"
-        "${FILES}/fedora-patches/0087-Use-2-instead-of-1-for-our-right-hand-margin-so-line.patch"
-        "${FILES}/fedora-patches/0092-Don-t-draw-a-border-around-the-menu.patch"
-        "${FILES}/fedora-patches/0093-Use-the-standard-margin-for-the-timeout-string.patch"
-        "${FILES}/fedora-patches/0100-Don-t-emit-Booting-.-message.patch"
-        "${FILES}/fedora-patches/0111-Reduce-timer-event-frequency-by-10.patch"
-        "${FILES}/0010-nckx-dont-print-dots.patch"
-        "${FILES}/0020-nckx-modifier-key-message-early.patch"
-        "${FILES}/0078-nckx-Don-t-add-to-highlighted-row.patch"
+        "${FILES}/0000-silence-early-boot-i386-pc.patch"
+        "${FILES}/0001-silence-kernel-welcome-message.patch"
+        "${FILES}/0002-silence-GNU-GRUB-banner.patch"
+        "${FILES}/0010-silence-gettext-errors.patch"
+        "${FILES}/0020-show-arrow-before-items-instead-of-asterisk.patch"
+        "${FILES}/0021-message-string-cleanups.patch"
+        "${FILES}/0022-remove-menu-border.patch"
 )
 DEFAULT_SRC_CONFIGURE_PARAMS+=(
     CPP="${CC} -E"
@@ -102,16 +91,15 @@ DEFAULT_SRC_CONFIGURE_PARAMS+=(
 
     --enable-liblzma
     --disable-libzfs
-    --disable-themes
     --disable-werror
     --disable-mm-debug
 
     --enable-boot-time
-    --enable-cache-stats
+    --disable-cache-stats
     --disable-efiemu
     --disable-grub-emu-pci
     --disable-grub-emu-sdl
-    --disable-grub-emu-usb
+    --enable-grub-emu-usb
 )
 DEFAULT_SRC_CONFIGURE_OPTION_ENABLES+=(
     'device-mapper'

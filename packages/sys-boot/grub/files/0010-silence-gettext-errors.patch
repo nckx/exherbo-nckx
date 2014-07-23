@@ -1,33 +1,11 @@
-From c363af23257c228d2380b4ddcc10bcd9081ebae7 Mon Sep 17 00:00:00 2001
-From: William Jon McCann <william.jon.mccann@gmail.com>
-Date: Wed, 15 May 2013 13:30:20 -0400
-Subject: [PATCH 076/112] Don't write messages to the screen
-
 Writing messages to the screen before the menus or boot splash
 happens so quickly it looks like something is wrong and isn't
 very appealing.
----
- grub-core/boot/i386/pc/boot.S     |  3 ---
- grub-core/boot/i386/pc/diskboot.S |  5 -----
- grub-core/gettext/gettext.c       | 15 ---------------
- grub-core/kern/main.c             |  5 -----
- util/grub.d/10_linux.in           |  7 -------
- 5 files changed, 35 deletions(-)
 
-diff --git a/grub-core/boot/i386/pc/boot.S b/grub-core/boot/i386/pc/boot.S
-index b4975e2..432a472 100644
---- a/grub-core/boot/i386/pc/boot.S
-+++ b/grub-core/boot/i386/pc/boot.S
-@@ -249,9 +249,6 @@ real_start:
- 	/* save drive reference first thing! */
- 	pushw	%dx
- 
--	/* print a notification message on the screen */
--	MSG(notification_string)
--
- 	/* set %si to the disk address packet */
- 	movw	$disk_address_packet, %si
- 
+Heavily based on Fedora's patch, with some hunks (re)moved.
+
+	-- nckx <tobias.geerinckx.rice@gmail.com>
+
 diff --git a/grub-core/gettext/gettext.c b/grub-core/gettext/gettext.c
 index 4880cef..1e5c21d 100644
 --- a/grub-core/gettext/gettext.c
@@ -87,22 +65,3 @@ index 4880cef..1e5c21d 100644
  
    grub_register_variable_hook ("locale_dir", NULL, read_main);
    grub_register_variable_hook ("secondary_locale_dir", NULL, read_secondary);
-diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
-index 8ab7794..da47b18 100644
---- a/grub-core/kern/main.c
-+++ b/grub-core/kern/main.c
-@@ -268,11 +268,6 @@ grub_main (void)
- 
-   grub_boot_time ("After machine init.");
- 
--  /* Hello.  */
--  grub_setcolorstate (GRUB_TERM_COLOR_HIGHLIGHT);
--  grub_printf ("Welcome to GRUB!\n\n");
--  grub_setcolorstate (GRUB_TERM_COLOR_STANDARD);
--
-   grub_load_config ();
- 
-   grub_boot_time ("Before loading embedded modules.");
--- 
-1.8.5.3
-

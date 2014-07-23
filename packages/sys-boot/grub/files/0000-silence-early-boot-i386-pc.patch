@@ -1,0 +1,81 @@
+GRUB prints all kinds of superfluous nonsense on boot. Stop that (but keep
+error message printing intact!)
+
+This also allows us to print something (usually in the bottom-left corner,
+hence the new-lines) useful about pressing Alt/Ctrl/Shift. This is not
+implemented by GRUB itself, however, so you may wish to edit the last hunk
+of this patch to suit you wishes.
+
+	-- nckx <tobias.geerinckx.rice@gmail.com>
+
+diff --git a/grub-core/boot/i386/pc/boot.S b/grub-core/boot/i386/pc/boot.S
+index b4975e2..cf10089 100644
+--- a/grub-core/boot/i386/pc/boot.S
++++ b/grub-core/boot/i386/pc/boot.S
+@@ -249,8 +249,8 @@ real_start:
+ 	/* save drive reference first thing! */
+ 	pushw	%dx
+ 
+-	/* print a notification message on the screen */
+-	MSG(notification_string)
++	/* hide the ugly blinking cursor */
++	call	LOCAL(hide_cursor)
+ 
+ 	/* set %si to the disk address packet */
+ 	movw	$disk_address_packet, %si
+@@ -478,7 +478,6 @@ LOCAL(general_error):
+ LOCAL(stop):
+ 	jmp	LOCAL(stop)
+ 
+-notification_string:	.asciz "GRUB "
+ geometry_error_string:	.asciz "Geom"
+ hd_probe_error_string:	.asciz "Hard Disk"
+ read_error_string:	.asciz "Read"
+@@ -503,6 +502,10 @@ LOCAL(message):
+ 	lodsb
+ 	cmpb	$0, %al
+ 	jne	1b	/* if not end of string, jmp to display */
++LOCAL(hide_cursor):
++	movw	$0x2000, %cx
++	movb	$0x01, %ah
++	int	$0x10
+ 	ret
+ 
+ 	/*
+diff --git a/grub-core/boot/i386/pc/diskboot.S b/grub-core/boot/i386/pc/diskboot.S
+index d030a14..cd40243 100644
+--- a/grub-core/boot/i386/pc/diskboot.S
++++ b/grub-core/boot/i386/pc/diskboot.S
+@@ -276,10 +276,8 @@ LOCAL(copy_buffer):
+ 	rep		/* sets a repeat */
+ 	movsw		/* this runs the actual copy */
+ 
+-	/* restore addressing regs and print a dot with correct DS
+-	   (MSG modifies SI, which is saved, and unused AX and BX) */
++	/* restore addressing regs */
+ 	popw	%ds
+-	MSG(notification_step)
+ 	popa
+ 
+ 	/* check if finished with this dataset */
+@@ -296,7 +294,6 @@ LOCAL(copy_buffer):
+ 
+ LOCAL(bootit):
+ 	/* print a newline */
+-	MSG(notification_done)
+ 	popw	%dx	/* this makes sure %dl is our "boot" drive */
+ 	ljmp	$0, $(GRUB_BOOT_MACHINE_KERNEL_ADDR + 0x200)
+ 
+@@ -320,11 +317,8 @@ LOCAL(stop):	jmp	LOCAL(stop)
+ /* go here when you need to stop the machine hard after an error condition */
+ LOCAL(stop):	jmp	LOCAL(stop)
+ 
+-notification_string:	.asciz "loading"
++notification_string:	.asciz  "" /* "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n<Press a key or something> message" */
+ 
+-notification_step:	.asciz "."
+-notification_done:	.asciz "\r\n"
+-
+ geometry_error_string:	.asciz "Geom"
+ read_error_string:	.asciz "Read"
+ general_error_string:	.asciz " Error"

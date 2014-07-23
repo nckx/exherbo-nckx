@@ -1,0 +1,20 @@
+No-one feels welcome to GRUB.
+
+	-- nckx <tobias.geerinckx.rice@gmail.com>
+
+diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
+index 8ab7794..da47b18 100644
+--- a/grub-core/kern/main.c
++++ b/grub-core/kern/main.c
+@@ -268,11 +268,6 @@ grub_main (void)
+ 
+   grub_boot_time ("After machine init.");
+ 
+-  /* Hello.  */
+-  grub_setcolorstate (GRUB_TERM_COLOR_HIGHLIGHT);
+-  grub_printf ("Welcome to GRUB!\n\n");
+-  grub_setcolorstate (GRUB_TERM_COLOR_STANDARD);
+-
+   grub_load_config ();
+ 
+   grub_boot_time ("Before loading embedded modules.");
