@@ -1,0 +1,28 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public License v3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+SUMMARY="Show progress of open files and file systems"
+DESCRIPTION="
+Ftop is to files what top is to processes. The progress of all open files
+and file systems can be monitored. If run as a regular user, the set of
+open files will be limited to those in that user's processes (which is
+generally all that is of interest to the user). In any case, the selection
+of which files to display is possible through a wide assortment of options.
+"
+HOMEPAGE="http://${PN}.googlecode.com/"
+LICENCES="GPL-3"
+SLOT="0"
+
+DOWNLOADS="${HOMEPAGE%/}/files/${PNV}.tar.bz2"
+
+DEPENDENCIES="
+    build+run:
+        sys-libs/ncurses
+"
+
+DEFAULT_SRC_PREPARE_PATCHES+=(
+    -p0 "${FILES}"/ftop-fix_buffer_overflow.patch
+    -p0 "${FILES}"/ftop-fix_printf_format.patch
+)
