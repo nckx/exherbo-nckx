@@ -72,11 +72,7 @@ linux-kernel_src_configure() {
 
     while echo; do :; done | emake ARCH="${HOSTTYPE}" oldconfig
 
-    local config_hash="$( grep -E "^(|# )CONFIG_" .config | sha1sum )"
-    edo sed \
-        -e 's|-dirty||g' \
-        -e 's|^echo "\$res"$|&"-c'"${config_hash:0:7}"'"|' \
-        -i scripts/setlocalversion
+    edo sed -e 's|-dirty||g' -i scripts/setlocalversion
 }
 
 linux-kernel_src_compile() {
