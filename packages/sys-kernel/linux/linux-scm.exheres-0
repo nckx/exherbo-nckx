@@ -9,29 +9,32 @@ DEPENDENCIES="
 "
 
 src_fetch_extra() {
+    edo rm -f "${FETCHEDDIR}"/linux-kernel_*.patch
+
     pushd "${TEMP}"
 
     ##
     ## BFQ disc scheduler
     ##
+if false; then
     local patch_uri="http://algo.ing.unimo.it/people/paolo/disk_sched/patches/"
     patch_release="$(
         wget -O - "${patch_uri}" |
             grep -o "3\.[0-9]*\.[0-9]*-[^/]*" |
                 sort --version-sort | tail -n 1
     )"
-    edo wget -nd --no-parent --level 1 -r -R "*.html" --reject \
-        "${patch_release}" "${patch_uri}${patch_release}"
+    edo wget -nd --no-parent --level 1 -r --accept "*.patch" \
+        "${patch_uri}${patch_release}"
     for patch in *.patch; do
         mv "${patch}" "${FETCHEDDIR}/linux-kernel-bfq-${patch}"
     done
+fi
 
     ##
     ## Processor-specific GCC optimisations
     ##
-    edo wget -O patch \
+    edo wget -O "${FETCHEDDIR}"/linux-kernel_optimise.patch \
         "https://raw.githubusercontent.com/graysky2/kernel_gcc_patch/master/enable_additional_cpu_optimizations_for_gcc_v4.9+_kernel_v3.15+.patch"
-    edo mv patch "${FETCHEDDIR}"/linux-kernel_optimise.patch
 
     ##
     ## TuxOnIce
@@ -42,8 +45,7 @@ src_fetch_extra() {
             grep -o '"tuxonice-for-linux-head-3\..*\.patch\.bz2"' |
                 sort --version-sort | tail -n 1
     )"
-    edo wget -O patch "${patch_uri//\"}"
-    edo mv patch "${FETCHEDDIR}"/linux-kernel_tuxonice.patch.bz2
+    edo wget -O "${FETCHEDDIR}"/linux-kernel_tuxonice.patch.bz2 "${patch_uri//\"}"
 
     popd
 
@@ -51,9 +53,11 @@ src_fetch_extra() {
 }
 
 src_prepare() {
+if false; then
     for patch in "${FETCHEDDIR}"/linux-kernel-bfq-*.patch; do
         edo patch -Np1 -i "${patch}"
     done
+fi
 
     edo patch -Np1 -i "${FETCHEDDIR}"/linux-kernel_optimise.patch
 
