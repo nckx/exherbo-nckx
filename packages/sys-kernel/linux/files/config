@@ -556,7 +556,7 @@ CONFIG_TOI_CORE=y
 #
 # Image Storage (you need at least one allocator)
 #
-CONFIG_TOI_FILE=m
+CONFIG_TOI_FILE=y
 CONFIG_TOI_SWAP=m
 
 #
