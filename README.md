@@ -11,6 +11,9 @@ plenty of e-mail as it is. Bugs for masked packages will be ignored!**
   [exherbo]: http://exherbo.org
   [tracker]: https://github.com/nckx/exherbo-repository-nckx/issues
 
-Unless indicated otherwise, all files in this repository are copyright
+Except where indicated otherwise, any file in this repository is copyright
 © 2014 Tobias Geerinckx-Rice, and distributed under the terms of the
-GNU General Public Licence version 3. See the LICENCE file for details.
+[GNU General Public Licence version 3][gnugpl3]. See the LICENCE file for
+details.
+
+  [gnugpl3]: http://gnu.org/copyleft/gpl.html
