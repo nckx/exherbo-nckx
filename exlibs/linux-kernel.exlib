@@ -50,7 +50,7 @@ DEPENDENCIES="
         sys-apps/bc
 "
 
-export_exlib_phases src_prepare src_configure src_compile src_install pkg_postinst pkg_postrm
+export_exlib_phases src_prepare src_configure src_compile src_install pkg_postinst pkg_prerm
 
 linux-kernel_src_prepare() {
     default
@@ -114,7 +114,7 @@ linux-kernel_pkg_postinst() {
     fi
 }
 
-linux-kernel_pkg_postrm() {
+linux-kernel_pkg_prerm() {
     if [[ ! "${ROOT%/}" ]]; then
         # from 'man kernel-install': "kernel-install removes the entire
         # directory /boot/MACHINE-ID/KERNEL-VERSION/ afterwards"
