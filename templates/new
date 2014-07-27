@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -e
+cd "${0%/*}"
+templates="${PWD}"
+cd packages
+mkdir "${1%/*}"
+mkdir "${1#*/}"
+cd "${1}"
+cp "${templates}"/template.* .
+mv {template,${1}}.exlib
+mv {template,${1}-${2}}.exheres-0
