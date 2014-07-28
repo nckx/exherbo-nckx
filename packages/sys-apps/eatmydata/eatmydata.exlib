@@ -8,8 +8,8 @@ DESCRIPTION="
 LD_PRELOAD library that disables all forms of writing data safely to disk. fsync() becomes a NO-OP, O_SYNC is removed etc.
 The idea is to use in testing to get faster test runs where real durability is not required.
 "
-HOMEPAGE="http://launchpad.net/${PN}"
-REMOTE_IDS="launchpad:${PN}"
+HOMEPAGE="http://launchpad.net/libeatmydata"
+REMOTE_IDS="launchpad:libeatmydata"
 LICENCES="GPL-3"
 SLOT="0"
 
