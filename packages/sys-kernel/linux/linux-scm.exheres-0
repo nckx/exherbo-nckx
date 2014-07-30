@@ -9,9 +9,11 @@ DEPENDENCIES="
 "
 
 src_fetch_extra() {
-    edo rm -f "${FETCHEDDIR}"/linux-kernel_*.patch
+    if ever is_scm; then
+        scm_src_fetch_extra
+    fi
 
-    pushd "${TEMP}"
+    edo rm -f "${FETCHEDDIR}"/linux-kernel_*.patch
 
     ##
     ## BFQ disc scheduler
@@ -23,10 +25,12 @@ if false; then
             grep -o "3\.[0-9]*\.[0-9]*-[^/]*" |
                 sort --version-sort | tail -n 1
     )"
-    edo wget -nd --no-parent --level 1 -r --accept "*.patch" \
+    edo wget \
+        --directory-prefix "${TEMP}" --accept "*.patch" \
+        --recursive --no-directories --no-parent --level 1 \
         "${patch_uri}${patch_release}"
-    for patch in *.patch; do
-        mv "${patch}" "${FETCHEDDIR}/linux-kernel-bfq-${patch}"
+    for patch in "${TEMP}"/*.patch; do
+        edo mv "${patch}" "${FETCHEDDIR}/linux-kernel-bfq-${patch}"
     done
 fi
 
@@ -35,24 +39,18 @@ fi
     ##
     edo wget -O "${FETCHEDDIR}"/linux-kernel_optimise.patch \
         "https://raw.githubusercontent.com/graysky2/kernel_gcc_patch/master/enable_additional_cpu_optimizations_for_gcc_v4.9+_kernel_v3.15+.patch"
-
-    ##
-    ## TuxOnIce
-    ##
-    local patch_uri="http://tuxonice.nigelcunningham.com.au/downloads/all/"
-    patch_uri+="$(
-        wget -O - "${patch_uri}" |
-            grep -o '"tuxonice-for-linux-head-3\..*\.patch\.bz2"' |
-                sort --version-sort | tail -n 1
-    )"
-    edo wget -O "${FETCHEDDIR}"/linux-kernel_tuxonice.patch.bz2 "${patch_uri//\"}"
-
-    popd
-
-    if ever is_scm; then scm_src_fetch_extra; fi
 }
 
 src_prepare() {
+    if ever is_scm; then
+        esandbox disable_net
+        edo git config user.email "paludis@example.com"
+        edo git config user.name "Paludis"
+        edo git pull git://git.kernel.org/pub/scm/linux/kernel/git/mason/linux-btrfs.git integration
+        edo git pull git://github.com/NigelCunningham/tuxonice-kernel.git tuxonice-head
+        esandbox enable_net
+    fi
+
 if false; then
     for patch in "${FETCHEDDIR}"/linux-kernel-bfq-*.patch; do
         edo patch -Np1 -i "${patch}"
@@ -60,9 +58,6 @@ if false; then
 fi
 
     edo patch -Np1 -i "${FETCHEDDIR}"/linux-kernel_optimise.patch
-
-    edo bzip2 -cd "${FETCHEDDIR}"/linux-kernel_tuxonice.patch.bz2 |
-        edo patch -Np1
 
     linux-kernel_src_prepare
 }
