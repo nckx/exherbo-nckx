@@ -120,15 +120,5 @@ linux-kernel_pkg_prerm() {
         # directory /boot/MACHINE-ID/KERNEL-VERSION/ afterwards"
         edo kernel-install remove "${LINUX_KERNEL_RELEASE}"
     fi
-
-    # But, as if it doesn't already do a horrible job at what it *does* do,
-    # kernel-install forgets to remove half of what it installs. Oopsie!
-    # THIS IS WHAT HAPPENS WHEN YOU LET RED HAT WRITE SOFTWARE, PEOPLE
-
-    # FIXME: this code has to make too many assumptions about system policy :(
-    # From the same man page: "The kernel-install plugin 50-depmod.install
-    # runs depmod for the KERNEL-VERSION." Because, again: utter idiots.
-    MODDIR="${LINUX_KERNEL_IMAGE%/*}"
-    edo rm -rf ${ROOT}/"${MODDIR}"
 }
 
