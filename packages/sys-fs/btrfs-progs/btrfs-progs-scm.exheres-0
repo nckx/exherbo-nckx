@@ -5,6 +5,7 @@ BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
 
 require btrfs-progs systemd-service [ systemd_files=[ \
     "${REPODIR}"/packages/${CATEGORY}/${PN}/files/systemd ] ]
+
 # Requiring github.exlib isn't possible when overriding scm-git!
 SCM_REPOSITORY="git://github.com/kdave/${PN}"
 require scm-git
