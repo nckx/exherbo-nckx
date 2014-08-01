@@ -4,5 +4,3 @@
 SCM_REPOSITORY="git://git.samba.org/nss_wrapper.git"
 require scm-git nss_wrapper
 
-PLATFORMS="~amd64"
-

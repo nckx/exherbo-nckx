@@ -8,8 +8,6 @@ SCM_REPOSITORY="git://sourceware.org/git/binutils-gdb.git"
 SCM_CHECKOUT_TO="binutils-gdb"
 require scm-git
 
-PLATFORMS="~amd64"
-
 DEFAULT_SRC_CONFIGURE_PARAMS+=(
     --disable-gdb
     --disable-libdecnumber

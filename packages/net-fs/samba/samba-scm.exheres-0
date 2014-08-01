@@ -60,8 +60,6 @@ DEPENDENCIES="
         syslog? ( virtual/syslog )
 "
 
-PLATFORMS="~amd64"
-
 require samba-component pam systemd-service
 
 WAF_SRC_CONFIGURE_PARAMS+=(

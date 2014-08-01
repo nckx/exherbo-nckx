@@ -3,5 +3,3 @@
 
 require syslinux
 
-PLATFORMS="~amd64"
-

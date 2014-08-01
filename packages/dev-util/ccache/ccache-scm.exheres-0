@@ -7,8 +7,6 @@ DOWNLOADS=
 SCM_REPOSITORY="git://git.samba.org/${PN}.git"
 require scm-git
 
-PLATFORMS="~amd64"
-
 src_prepare() {
     edo ./autogen.sh
 

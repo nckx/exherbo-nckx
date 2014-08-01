@@ -9,8 +9,6 @@ DEPENDENCIES="
         app-doc/asciidoc
 "
 
-PLATFORMS="~amd64"
-
 src_prepare() {
     edo ./autogen.sh
 }

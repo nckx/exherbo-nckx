@@ -3,5 +3,3 @@
 
 require bully github [ user=bdpurcell ]
 
-PLATFORMS="~amd64"
-

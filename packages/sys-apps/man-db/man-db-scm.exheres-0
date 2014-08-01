@@ -6,8 +6,6 @@ require man-db
 SCM_REPOSITORY="git://git.savannah.nongnu.org/${PN}.git"
 require scm-git
 
-PLATFORMS="~amd64"
-
 src_prepare() {
     edo ./autogen.sh
     edo sed 's@ gnulib/po@@' -i Makefile.in

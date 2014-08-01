@@ -18,5 +18,3 @@ DEPENDENCIES="
         ) [[ description = [ Need xsltproc to build the manual page ] ]]
 "
 
-PLATFORMS="~amd64"
-

@@ -6,8 +6,6 @@ SCM_REPOSITORY="git://repo.or.cz/gstfs-ng.git"
 SCM_BRANCH="v0.2dev"
 require gstfs scm-git
 
-PLATFORMS="~amd64"
-
 src_prepare() {
     edo autoreconf --install
 }

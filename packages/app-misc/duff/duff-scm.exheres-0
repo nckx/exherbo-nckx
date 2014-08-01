@@ -3,8 +3,6 @@
 
 require duff github [ user=elmindreda ]
 
-PLATFORMS="~amd64"
-
 DEPENDENCIES="
     build+run:
         sys-devel/autoconf-wrapper

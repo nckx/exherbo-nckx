@@ -3,5 +3,3 @@
 
 require gcc-scm
 
-PLATFORMS="~amd64"
-

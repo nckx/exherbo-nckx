@@ -10,8 +10,6 @@ with Linux.
 "
 LICENCES="rtlwifi_firmware"
 
-PLATFORMS="~amd64"
-
 DEFAULT_SRC_INSTALL_EXTRA_DOCS+=( LICENCE.${LICENCES}.txt )
 
 src_install() {

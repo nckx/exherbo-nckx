@@ -4,8 +4,6 @@
 require tre github [ user=laurikari ]
 DOWNLOADS=
 
-PLATFORMS="~amd64"
-
 src_prepare() {
     edo utils/autogen.sh
 }

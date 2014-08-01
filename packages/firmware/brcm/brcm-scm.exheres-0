@@ -10,7 +10,5 @@ with Linux.
 "
 LICENCES="broadcom_bcm43xx"
 
-PLATFORMS="~amd64"
-
 DEFAULT_SRC_INSTALL_EXTRA_DOCS+=( LICENCE."${LICENCES}" )
 

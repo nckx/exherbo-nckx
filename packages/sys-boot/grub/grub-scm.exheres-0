@@ -3,5 +3,3 @@
 
 require grub
 
-PLATFORMS="~amd64"
-

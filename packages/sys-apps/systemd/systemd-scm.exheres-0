@@ -14,5 +14,3 @@ require systemd
 SCM_REPOSITORY="https://github.com/${PN}/${PN}.git"
 require scm-git
 
-PLATFORMS="~amd64"
-

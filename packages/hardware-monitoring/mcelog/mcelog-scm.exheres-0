@@ -6,5 +6,3 @@ require mcelog
 SCM_REPOSITORY="git://git.kernel.org/pub/scm/utils/cpu/mce/${PN}.git"
 require scm-git
 
-PLATFORMS="~amd64"
-

@@ -14,8 +14,6 @@ that are available on no platform at all belong in other subsystems
 "
 LICENCES="LGPL-3"
 
-PLATFORMS="~amd64"
-
 src_install() {
     waf_src_install
 

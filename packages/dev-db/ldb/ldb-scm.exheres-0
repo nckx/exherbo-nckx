@@ -26,5 +26,3 @@ DEPENDENCIES="
         net-directory/openldap [[ description = [ ldb can use OpenLDAP as a backend ] ]]
 "
 
-PLATFORMS="~amd64"
-

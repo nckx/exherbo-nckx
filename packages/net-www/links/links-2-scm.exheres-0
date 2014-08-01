@@ -7,5 +7,3 @@ require links2
 SCM_REPOSITORY="https://alioth.debian.org/anonscm/git/collab-maint/links2.git"
 require scm-git
 
-PLATFORMS="~amd64"
-

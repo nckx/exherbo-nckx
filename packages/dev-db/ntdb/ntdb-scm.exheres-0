@@ -7,5 +7,3 @@ require samba-component
 
 WAF_SRC_CONFIGURE_PARAMS+=( --builtin-libraries=ccan ) # FIXME?
 
-PLATFORMS="~amd64"
-

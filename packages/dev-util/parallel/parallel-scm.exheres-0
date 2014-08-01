@@ -7,8 +7,6 @@ require parallel
 SCM_REPOSITORY="git://git.savannah.gnu.org/parallel.git"
 require scm-git
 
-PLATFORMS="~amd64"
-
 src_prepare() {
     default
 

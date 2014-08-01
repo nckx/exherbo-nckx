@@ -3,5 +3,3 @@
 
 require dstat github [ user=dagwieers ]
 
-PLATFORMS="~amd64"
-

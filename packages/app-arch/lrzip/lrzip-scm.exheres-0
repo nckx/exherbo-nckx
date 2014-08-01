@@ -6,8 +6,6 @@ require lrzip
 DOWNLOADS=
 require github [ user=ckolivas ]
 
-PLATFORMS="~amd64"
-
 src_prepare() {
     edo ./autogen.sh
     emake distclean

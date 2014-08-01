@@ -12,8 +12,6 @@ DEPENDENCIES="
         net-misc/rsync
 "
 
-PLATFORMS="~amd64"
-
 SCM_HOME="${FETCHEDDIR}/scm"
 
 src_fetch_extra() {

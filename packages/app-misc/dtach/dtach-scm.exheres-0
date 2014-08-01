@@ -6,5 +6,3 @@ require dtach
 # Avoid relying on the obsolete CVS client, which never even worked on my box:
 DOWNLOADS="http://${PN}.cvs.sourceforge.net/viewvc/${PN}/?view=tar -> ${PNVR}.tar.gz"
 
-PLATFORMS="~amd64"
-

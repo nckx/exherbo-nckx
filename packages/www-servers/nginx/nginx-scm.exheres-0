@@ -4,5 +4,3 @@
 SCM_REPOSITORY="http://hg.nginx.org/nginx"
 require scm-hg nginx
 
-PLATFORMS="~amd64"
-

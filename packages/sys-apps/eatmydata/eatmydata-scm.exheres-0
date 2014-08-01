@@ -7,8 +7,6 @@ SCM_REPOSITORY="http://bazaar.launchpad.net/~stewart/libeatmydata/"
 SCM_BRANCH="main"
 require scm-bzr
 
-PLATFORMS="~amd64"
-
 src_prepare() {
     edo config/autorun.sh
 }

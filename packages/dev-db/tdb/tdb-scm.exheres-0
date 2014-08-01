@@ -11,5 +11,3 @@ DEPENDENCIES="
         dev-libs/libreplace[~scm]
 "
 
-PLATFORMS="~amd64"
-

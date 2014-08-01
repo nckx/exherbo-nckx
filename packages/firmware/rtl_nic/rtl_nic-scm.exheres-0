@@ -10,5 +10,3 @@ with Linux.
 "
 LICENCES="rtl_nic"
 
-PLATFORMS="~amd64"
-
