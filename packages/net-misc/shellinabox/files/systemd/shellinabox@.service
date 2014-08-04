@@ -1,0 +1,9 @@
+[Unit]
+Description=Shell in a Box on port %I
+
+[Service]
+ExecStart=/usr/bin/shellinaboxd --port=%I --linkify=aggressive --no-beep
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
