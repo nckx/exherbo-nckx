@@ -1,7 +1,7 @@
 # Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
 # Distributed under the terms of the GNU General Public License v3
 
-#BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
 
 require systemd-service
 
@@ -61,7 +61,7 @@ shellinabox_src_prepare() {
         -i ${PN}/root_page.html
 
     # Compress the insanely wasteful CSS indentation. Please note that doing
-    # this any more aggressively would badly break the on-screen keyboard!
+    # this any more aggressively WILL badly break the on-screen keyboard!
     edo sed \
         -e 's/^ *//' \
         -e '/^$/d' \
