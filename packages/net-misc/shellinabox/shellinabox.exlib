@@ -20,12 +20,13 @@ LICENCES="GPL-2"
 SLOT="0"
 MYOPTIONS="
     ssl
+    pam
 "
 
 DEPENDENCIES="
     build+run:
         ssl? ( dev-libs/openssl )
-        sys-libs/pam
+        pam? ( sys-libs/pam )
 "
 
 DEFAULT_SRC_PREPARE_PATCHES+=(
@@ -35,6 +36,7 @@ DEFAULT_SRC_PREPARE_PATCHES+=(
 )
 DEFAULT_SRC_CONFIGURE_OPTION_ENABLES=(
     ssl
+    pam
 )
 
 DEFAULT_SRC_INSTALL_EXTRA_DOCS=(
