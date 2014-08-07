@@ -91,17 +91,14 @@ linux-kernel_src_install() {
     ## We don't install sources, so remove these bogus links
     edo rm -f "${IMAGE}/${MODDIR}"/{build,source}
 
-    LINUX_KERNEL_IMAGE=linux
     insinto /"${MODDIR}"
     insopts -m0644 -o root -g root
-    newins \
-        "$( readlink -m "arch/${HOSTTYPE}/boot/bzImage" )" \
-        "${LINUX_KERNEL_IMAGE}"
+    newins "$( readlink -m "arch/${HOSTTYPE}/boot/bzImage" )" ${PN}
     doins System.map
 
     export \
         LINUX_KERNEL_RELEASE \
-        LINUX_KERNEL_IMAGE="/${MODDIR}/${LINUX_KERNEL_IMAGE}"
+        LINUX_KERNEL_IMAGE=/"${MODDIR}"/${PN}
 }
 
 linux-kernel_pkg_postinst() {
