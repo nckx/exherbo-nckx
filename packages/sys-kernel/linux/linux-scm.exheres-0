@@ -4,60 +4,41 @@
 require linux-kernel
 
 DEPENDENCIES="
-    build:
+    fetch:
         net-misc/wget
 "
+
+LINUX_GCC_PATCH="enable_additional_cpu_optimizations_for_gcc_v4.9+_kernel_v3.15+.patch"
 
 src_fetch_extra() {
     if ever is_scm; then
         scm_src_fetch_extra
     fi
 
-    edo rm -f "${FETCHEDDIR}"/linux-kernel_*.patch
-
-    ##
-    ## BFQ disc scheduler
-    ##
-if false; then
-    local patch_uri="http://algo.ing.unimo.it/people/paolo/disk_sched/patches/"
-    patch_release="$(
-        wget -O - "${patch_uri}" |
-            grep -o "3\.[0-9]*\.[0-9]*-[^/]*" |
-                sort --version-sort | tail -n 1
-    )"
     edo wget \
-        --directory-prefix "${TEMP}" --accept "*.patch" \
-        --recursive --no-directories --no-parent --level 1 \
-        "${patch_uri}${patch_release}"
-    for patch in "${TEMP}"/*.patch; do
-        edo mv "${patch}" "${FETCHEDDIR}/linux-kernel-bfq-${patch}"
-    done
-fi
-
-    ##
-    ## Processor-specific GCC optimisations
-    ##
-    edo wget -O "${FETCHEDDIR}"/linux-kernel_optimise.patch \
-        "https://raw.githubusercontent.com/graysky2/kernel_gcc_patch/master/enable_additional_cpu_optimizations_for_gcc_v4.9+_kernel_v3.15+.patch"
+        -O "${FETCHEDDIR}/${LINUX_GCC_PATCH}" \
+        "https://raw.githubusercontent.com/graysky2/kernel_gcc_patch/master/${LINUX_GCC_PATCH}"
 }
+
+DEFAULT_SRC_PREPARE_PATCHES+=(
+    "${FETCHEDDIR}/${LINUX_GCC_PATCH}"
+)
 
 src_prepare() {
     if ever is_scm; then
-        esandbox disable_net
         edo git config user.email "paludis@example.com"
         edo git config user.name "Paludis"
+
+        esandbox disable_net
         edo git pull git://git.kernel.org/pub/scm/linux/kernel/git/mason/linux-btrfs.git integration
-        edo git pull git://github.com/NigelCunningham/tuxonice-kernel.git tuxonice-head
+#        edo git pull git://github.com/NigelCunningham/tuxonice-kernel.git tuxonice-head
         esandbox enable_net
+
+        # FIXME temporary work-around
+#        edo sed -e "/ftrace_start/d" \
+ #           -e "/ftrace_stop/d" \
+  #          -i kernel/power/tuxonice_atomic_copy.c
     fi
-
-if false; then
-    for patch in "${FETCHEDDIR}"/linux-kernel-bfq-*.patch; do
-        edo patch -Np1 -i "${patch}"
-    done
-fi
-
-    edo patch -Np1 -i "${FETCHEDDIR}"/linux-kernel_optimise.patch
 
     linux-kernel_src_prepare
 }
