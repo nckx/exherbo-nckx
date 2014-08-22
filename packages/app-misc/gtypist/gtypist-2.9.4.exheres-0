@@ -1,0 +1,7 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public Licence version 3
+
+require gtypist
+
+DOWNLOADS="http://ftp.gnu.org/gnu/${PN}/${PNV}.tar.xz"
+

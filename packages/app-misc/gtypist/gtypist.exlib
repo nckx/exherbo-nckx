@@ -1,0 +1,15 @@
+# Copyright 2014 Tobias Geerinckx-Rice (nckx) <tobias.geerinckx.rice@gmail.com>
+# Distributed under the terms of the GNU General Public Licence version 3
+
+BUGS_TO="https://github.com/nckx/exherbo-repository-nckx/issues"
+
+# FIXME:
+SUMMARY="Universal ncurses typing tutor"
+DESCRIPTION="
+You can learn correct typing and improve your skills by practising its
+exercises on a regular basis.
+"
+HOMEPAGE="http://www.gnu.org/software/${PN}"
+LICENCES="GPL-3"
+SLOT="0"
+
